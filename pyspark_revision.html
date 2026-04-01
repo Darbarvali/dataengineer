@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PySpark Revision Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --bg2: #13161e;
+    --bg3: #1a1e28;
+    --bg4: #222736;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --text: #e8eaf0;
+    --text2: #8b90a4;
+    --text3: #555b6e;
+    --accent: #f97316;
+    --accent2: #fb923c;
+    --blue: #60a5fa;
+    --teal: #2dd4bf;
+    --green: #4ade80;
+    --purple: #a78bfa;
+    --pink: #f472b6;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --code-bg: #0a0c10;
+    --mono: 'JetBrains Mono', monospace;
+    --display: 'Syne', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--display);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Animated background grid */
+  body::before {
+    content: '';
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+  /* HEADER */
+  header {
+    padding: 40px 0 30px;
+    text-align: center;
+    position: relative;
+  }
+  .header-badge {
+    display: inline-block;
+    background: rgba(249,115,22,0.15);
+    border: 1px solid rgba(249,115,22,0.3);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  h1 {
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+  h1 span { color: var(--accent); }
+  .header-sub {
+    color: var(--text2);
+    font-size: 15px;
+    max-width: 500px;
+    margin: 0 auto 28px;
+  }
+
+  /* PROGRESS */
+  .global-progress {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .progress-label { font-size: 12px; color: var(--text2); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+  .progress-track { flex: 1; min-width: 120px; height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--yellow)); border-radius: 3px; width: 0%; transition: width 0.5s ease; }
+  .progress-pct { font-size: 13px; font-weight: 600; color: var(--accent); min-width: 36px; }
+  .stats-row { display: flex; gap: 20px; }
+  .stat { text-align: center; }
+  .stat-val { font-size: 20px; font-weight: 800; color: var(--text); }
+  .stat-lab { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* NAV TABS */
+  .nav-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+    background: var(--bg2);
+    padding: 8px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+  }
+  .nav-tab {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text2);
+    border: none;
+    background: transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: var(--display);
+  }
+  .nav-tab:hover { color: var(--text); background: var(--bg3); }
+  .nav-tab.active { background: var(--accent); color: #fff; }
+
+  /* SECTIONS */
+  .section { display: none; animation: fadeIn 0.25s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* CARDS */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-bottom: 18px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--border2); }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+  @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  /* CODE BLOCKS */
+  pre, .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.75;
+    overflow-x: auto;
+    margin: 10px 0;
+    color: #c9d1d9;
+  }
+  .kw { color: #ff79c6; }
+  .fn { color: #8be9fd; }
+  .str { color: #f1fa8c; }
+  .cm { color: #6272a4; font-style: italic; }
+  .num { color: #bd93f9; }
+  .cls { color: #50fa7b; }
+
+  /* TAGS */
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin: 2px;
+    font-family: var(--mono);
+  }
+  .tag-orange { background: rgba(249,115,22,0.15); color: var(--accent); border: 1px solid rgba(249,115,22,0.25); }
+  .tag-blue { background: rgba(96,165,250,0.12); color: var(--blue); border: 1px solid rgba(96,165,250,0.2); }
+  .tag-green { background: rgba(74,222,128,0.12); color: var(--green); border: 1px solid rgba(74,222,128,0.2); }
+  .tag-teal { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+  .tag-purple { background: rgba(167,139,250,0.12); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); }
+  .tag-red { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+
+  /* METHOD TABLE */
+  .method-table { width: 100%; border-collapse: collapse; }
+  .method-table tr { border-bottom: 1px solid var(--border); }
+  .method-table tr:last-child { border-bottom: none; }
+  .method-table td { padding: 8px 4px; vertical-align: top; }
+  .method-name { font-family: var(--mono); font-size: 12px; color: var(--blue); white-space: nowrap; padding-right: 14px !important; }
+  .method-desc { font-size: 13px; color: var(--text2); }
+  .method-tag { font-size: 10px; font-family: var(--mono); }
+
+  /* ARCHITECTURE DIAGRAM */
+  .arch-diagram {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 20px 0;
+  }
+  .arch-node {
+    padding: 10px 32px; border-radius: 10px;
+    font-size: 13px; font-weight: 600; text-align: center;
+    min-width: 260px;
+  }
+  .arch-driver { background: rgba(96,165,250,0.15); border: 1px solid rgba(96,165,250,0.3); color: var(--blue); }
+  .arch-cluster { background: rgba(45,212,191,0.1); border: 1px solid rgba(45,212,191,0.25); color: var(--teal); }
+  .arch-executor { background: rgba(249,115,22,0.12); border: 1px solid rgba(249,115,22,0.25); color: var(--accent); min-width: 100px; }
+  .arch-task { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); color: var(--green); padding: 5px 12px; font-size: 11px; border-radius: 6px; }
+  .arch-arrow { color: var(--text3); font-size: 20px; }
+  .executors-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .executor-box { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .tasks-row { display: flex; gap: 5px; }
+
+  /* LAZY EVAL DEMO */
+  .pipeline-steps { display: flex; gap: 0; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .pipe-step {
+    display: flex; flex-direction: column; align-items: center;
+    min-width: 90px;
+  }
+  .pipe-box {
+    padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    font-family: var(--mono); text-align: center; cursor: pointer;
+    transition: all 0.2s; border: 1px solid transparent;
+  }
+  .pipe-box.transform { background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.2); color: var(--purple); }
+  .pipe-box.action { background: rgba(249,115,22,0.15); border-color: rgba(249,115,22,0.3); color: var(--accent); }
+  .pipe-box.transform:hover { background: rgba(167,139,250,0.2); }
+  .pipe-box.action:hover { background: rgba(249,115,22,0.25); }
+  .pipe-label { font-size: 10px; color: var(--text3); margin-top: 4px; }
+  .pipe-arrow { color: var(--text3); margin: 0 2px; display: flex; align-items: center; padding-top: 4px; font-size: 18px; }
+
+  /* QUIZ */
+  .quiz-container { max-width: 700px; margin: 0 auto; }
+  .quiz-progress-bar { height: 4px; background: var(--bg4); border-radius: 2px; margin-bottom: 20px; overflow: hidden; }
+  .quiz-progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s; }
+  .quiz-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text3); margin-bottom: 14px; }
+  .quiz-question {
+    font-size: 17px; font-weight: 600; color: var(--text);
+    line-height: 1.5; margin-bottom: 20px;
+  }
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+  .quiz-opt {
+    padding: 14px 18px; border-radius: 10px;
+    border: 1px solid var(--border2);
+    background: var(--bg3);
+    font-size: 14px; color: var(--text);
+    cursor: pointer; transition: all 0.15s;
+    text-align: left; font-family: var(--display);
+  }
+  .quiz-opt:hover:not(.disabled) { border-color: var(--accent); background: rgba(249,115,22,0.08); }
+  .quiz-opt.correct { border-color: var(--green); background: rgba(74,222,128,0.1); color: var(--green); }
+  .quiz-opt.wrong { border-color: var(--red); background: rgba(248,113,113,0.1); color: var(--red); }
+  .quiz-opt.disabled { cursor: default; }
+  .quiz-feedback {
+    margin-top: 14px; padding: 12px 16px;
+    border-radius: 10px; font-size: 13px; line-height: 1.6;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); color: var(--green); }
+  .quiz-feedback.wrong { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.2); color: var(--red); }
+  .quiz-nav { display: flex; justify-content: space-between; margin-top: 18px; align-items: center; }
+  .btn {
+    padding: 10px 22px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; border: none; font-family: var(--display);
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-ghost { background: var(--bg3); color: var(--text2); border: 1px solid var(--border2); }
+  .btn-ghost:hover { background: var(--bg4); color: var(--text); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .quiz-score-card {
+    text-align: center; padding: 40px;
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 14px;
+  }
+  .score-big { font-size: 64px; font-weight: 800; color: var(--accent); line-height: 1; margin: 10px 0; }
+  .score-msg { font-size: 16px; color: var(--text2); }
+
+  /* INTERACTIVE DEMO */
+  .demo-input {
+    width: 100%; padding: 10px 14px;
+    background: var(--code-bg); border: 1px solid var(--border2);
+    border-radius: 8px; color: var(--text); font-family: var(--mono);
+    font-size: 13px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .demo-input:focus { border-color: var(--accent); }
+  .demo-output {
+    margin-top: 10px; padding: 12px 16px;
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; font-family: var(--mono); font-size: 12.5px;
+    color: var(--green); min-height: 40px; white-space: pre-wrap;
+  }
+  .run-btn {
+    margin-top: 8px; padding: 8px 20px;
+    background: rgba(74,222,128,0.15); border: 1px solid rgba(74,222,128,0.25);
+    color: var(--green); border-radius: 8px; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: var(--display); transition: all 0.15s;
+  }
+  .run-btn:hover { background: rgba(74,222,128,0.25); }
+
+  /* PARTITION VIZ */
+  .partitions-wrap { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .partition-box {
+    flex: 1; min-width: 80px; border: 1px solid var(--border2);
+    border-radius: 8px; padding: 10px 8px; text-align: center;
+    background: var(--bg3); transition: all 0.3s;
+  }
+  .partition-num { font-size: 10px; color: var(--text3); margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .partition-items { font-family: var(--mono); font-size: 11px; color: var(--teal); }
+  .slider-row { display: flex; align-items: center; gap: 12px; margin: 12px 0; }
+  .slider-label { font-size: 13px; color: var(--text2); min-width: 80px; }
+  input[type=range] {
+    flex: 1; -webkit-appearance: none; height: 4px;
+    background: var(--bg4); border-radius: 2px; outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 16px; height: 16px;
+    background: var(--accent); border-radius: 50%; cursor: pointer;
+  }
+  .slider-val { font-size: 13px; font-weight: 600; color: var(--accent); min-width: 24px; }
+
+  /* CHEAT SHEET */
+  .cheat-section { margin-bottom: 24px; }
+  .cheat-section-title {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--accent); margin-bottom: 10px;
+    padding-bottom: 6px; border-bottom: 1px solid var(--border);
+  }
+  .cheat-row {
+    display: flex; gap: 14px; align-items: baseline;
+    padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03);
+    font-size: 13px;
+  }
+  .cheat-code { font-family: var(--mono); font-size: 12px; color: var(--blue); min-width: 220px; flex-shrink: 0; }
+  .cheat-desc { color: var(--text2); }
+
+  /* COMPARISON TABLE */
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .compare-table th { padding: 10px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); border-bottom: 1px solid var(--border2); }
+  .compare-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text2); }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table td:first-child { font-family: var(--mono); font-size: 12px; color: var(--text); }
+
+  /* STREAMING */
+  .stream-demo { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px; min-height: 80px; }
+  .stream-line { font-family: var(--mono); font-size: 12px; padding: 2px 0; opacity: 0; animation: streamIn 0.3s forwards; }
+  @keyframes streamIn { to { opacity: 1; } }
+  .stream-green { color: var(--green); }
+  .stream-blue { color: var(--blue); }
+  .stream-yellow { color: var(--yellow); }
+
+  /* EXPANDABLE */
+  .expand-item { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; overflow: hidden; }
+  .expand-header {
+    padding: 14px 18px; cursor: pointer; display: flex; justify-content: space-between;
+    align-items: center; font-size: 14px; font-weight: 600; background: var(--bg3);
+    transition: background 0.15s;
+  }
+  .expand-header:hover { background: var(--bg4); }
+  .expand-icon { color: var(--accent); font-size: 18px; transition: transform 0.2s; }
+  .expand-body { display: none; padding: 16px 18px; background: var(--bg2); border-top: 1px solid var(--border); }
+  .expand-body.open { display: block; }
+  .expand-icon.open { transform: rotate(45deg); }
+
+  /* SEARCH */
+  .search-box {
+    width: 100%; padding: 12px 16px; margin-bottom: 18px;
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: 10px; color: var(--text); font-family: var(--display);
+    font-size: 14px; outline: none; transition: border-color 0.2s;
+  }
+  .search-box:focus { border-color: var(--accent); }
+  .search-box::placeholder { color: var(--text3); }
+
+  /* COPY BUTTON */
+  .code-wrap { position: relative; }
+  .copy-btn {
+    position: absolute; top: 8px; right: 8px;
+    padding: 4px 10px; font-size: 10px; font-weight: 600;
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 5px; color: var(--text2); cursor: pointer;
+    font-family: var(--display); transition: all 0.15s;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+  footer { text-align: center; padding: 40px 0 30px; color: var(--text3); font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="header-badge">⚡ Interactive Revision Guide</div>
+    <h1>Py<span>Spark</span></h1>
+    <p class="header-sub">Master distributed data processing with hands-on examples, live demos, and quizzes.</p>
+  </header>
+
+  <div class="global-progress">
+    <div class="progress-label">Progress</div>
+    <div class="progress-track"><div class="progress-fill" id="globalProgress"></div></div>
+    <div class="progress-pct" id="progressPct">0%</div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-val" id="visitedCount">0</div><div class="stat-lab">Topics</div></div>
+      <div class="stat"><div class="stat-val" id="quizScore">—</div><div class="stat-lab">Quiz</div></div>
+    </div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('overview')">🏗 Overview</button>
+    <button class="nav-tab" onclick="showTab('rdds')">🧩 RDDs</button>
+    <button class="nav-tab" onclick="showTab('dataframes')">📊 DataFrames</button>
+    <button class="nav-tab" onclick="showTab('transforms')">🔄 Transforms</button>
+    <button class="nav-tab" onclick="showTab('sql')">🗄 Spark SQL</button>
+    <button class="nav-tab" onclick="showTab('streaming')">🌊 Streaming</button>
+    <button class="nav-tab" onclick="showTab('optimization')">⚡ Optimization</button>
+    <button class="nav-tab" onclick="showTab('cheatsheet')">📋 Cheat Sheet</button>
+    <button class="nav-tab" onclick="showTab('quiz')">🧠 Quiz</button>
+  </div>
+
+  <!-- ===== OVERVIEW ===== -->
+  <div class="section active" id="tab-overview">
+    <div class="card">
+      <div class="card-title">Architecture</div>
+      <div class="arch-diagram">
+        <div class="arch-node arch-driver">Driver Program (SparkSession / SparkContext)</div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-node arch-cluster">Cluster Manager (YARN · Mesos · Kubernetes · Standalone)</div>
+        <div class="arch-arrow">↓</div>
+        <div class="executors-row">
+          <div class="executor-box">
+            <div class="arch-node arch-executor">Executor 1</div>
+            <div class="tasks-row">
+              <div class="arch-task">Task</div><div class="arch-task">Task</div>
+            </div>
+          </div>
+          <div class="executor-box">
+            <div class="arch-node arch-executor">Executor 2</div>
+            <div class="tasks-row">
+              <div class="arch-task">Task</div><div class="arch-task">Task</div>
+            </div>
+          </div>
+          <div class="executor-box">
+            <div class="arch-node arch-executor">Executor 3</div>
+            <div class="tasks-row">
+              <div class="arch-task">Task</div><div class="arch-task">Task</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Core Abstractions</div>
+        <table class="method-table">
+          <tr><td class="method-name">SparkContext</td><td class="method-desc">Entry point (legacy, Spark &lt;2.0)</td></tr>
+          <tr><td class="method-name">SparkSession</td><td class="method-desc">Unified entry point (modern API)</td></tr>
+          <tr><td class="method-name">RDD</td><td class="method-desc">Resilient Distributed Dataset</td></tr>
+          <tr><td class="method-name">DataFrame</td><td class="method-desc">Distributed table with schema</td></tr>
+          <tr><td class="method-name">Dataset</td><td class="method-desc">Typed API (JVM/Scala only)</td></tr>
+          <tr><td class="method-name">DAG</td><td class="method-desc">Directed Acyclic Graph of stages</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">Lazy Evaluation Pipeline</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Nothing runs until an <span style="color:var(--accent);font-weight:600;">action</span> is triggered. Click each step to see what it does.</p>
+        <div class="pipeline-steps" id="pipelineSteps">
+          <div class="pipe-step">
+            <div class="pipe-box transform" onclick="showPipeInfo('read','Read source data (file, DB, stream)')">read()</div>
+            <div class="pipe-label">Transform</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step">
+            <div class="pipe-box transform" onclick="showPipeInfo('filter','Filters rows — lazy, no data movement')">filter()</div>
+            <div class="pipe-label">Transform</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step">
+            <div class="pipe-box transform" onclick="showPipeInfo('select','Projects columns — builds the query plan')">select()</div>
+            <div class="pipe-label">Transform</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step">
+            <div class="pipe-box transform" onclick="showPipeInfo('groupBy','Groups data — shuffle may happen at action time')">groupBy()</div>
+            <div class="pipe-label">Transform</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step">
+            <div class="pipe-box action" onclick="showPipeInfo('collect','ACTION: triggers full DAG execution, returns to driver')">collect()</div>
+            <div class="pipe-label">Action ⚡</div>
+          </div>
+        </div>
+        <div id="pipeInfo" style="margin-top:12px;font-size:13px;color:var(--text2);padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);display:none;"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Creating a SparkSession</div>
+      <div class="code-wrap">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> <span class="cls">SparkSession</span>
+
+spark = <span class="cls">SparkSession</span>.<span class="fn">builder</span> \
+    .<span class="fn">appName</span>(<span class="str">"MyApp"</span>) \
+    .<span class="fn">master</span>(<span class="str">"local[*]"</span>) \
+    .<span class="fn">config</span>(<span class="str">"spark.executor.memory"</span>, <span class="str">"2g"</span>) \
+    .<span class="fn">config</span>(<span class="str">"spark.sql.shuffle.partitions"</span>, <span class="str">"200"</span>) \
+    .<span class="fn">getOrCreate</span>()
+
+sc = spark.sparkContext  <span class="cm"># SparkContext</span>
+spark.<span class="fn">stop</span>()            <span class="cm"># Always stop when done</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RDDs ===== -->
+  <div class="section" id="tab-rdds">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Creating RDDs</div>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre><span class="cm"># From Python collection</span>
+rdd = sc.<span class="fn">parallelize</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>])
+rdd = sc.<span class="fn">parallelize</span>(data, numSlices=<span class="num">4</span>)
+
+<span class="cm"># From files</span>
+rdd = sc.<span class="fn">textFile</span>(<span class="str">"hdfs://path/file.txt"</span>)
+rdd = sc.<span class="fn">wholeTextFiles</span>(<span class="str">"path/dir"</span>)
+
+<span class="cm"># From DataFrame</span>
+rdd = df.<span class="fn">rdd</span></pre>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Partition Visualizer</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">Slide to change partition count and see data distribution:</p>
+        <div class="slider-row">
+          <span class="slider-label">Partitions</span>
+          <input type="range" min="1" max="6" value="3" id="partSlider" oninput="updatePartitions(this.value)">
+          <span class="slider-val" id="partVal">3</span>
+        </div>
+        <div class="partitions-wrap" id="partitionsWrap"></div>
+        <p style="font-size:12px;color:var(--text3);margin-top:8px;">Data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">RDD Transformations (Lazy)</div>
+      <div class="code-wrap">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre>rdd.<span class="fn">map</span>(<span class="kw">lambda</span> x: x * <span class="num">2</span>)              <span class="cm"># 1-to-1 mapping</span>
+rdd.<span class="fn">flatMap</span>(<span class="kw">lambda</span> x: x.split(<span class="str">" "</span>))    <span class="cm"># 1-to-many mapping</span>
+rdd.<span class="fn">filter</span>(<span class="kw">lambda</span> x: x > <span class="num">3</span>)           <span class="cm"># keep matching rows</span>
+rdd.<span class="fn">distinct</span>()                         <span class="cm"># remove duplicates</span>
+rdd.<span class="fn">sortBy</span>(<span class="kw">lambda</span> x: x[<span class="num">1</span>])            <span class="cm"># sort by key func</span>
+rdd.<span class="fn">groupByKey</span>()                       <span class="cm"># group (key,val) pairs</span>
+rdd.<span class="fn">reduceByKey</span>(<span class="kw">lambda</span> a,b: a+b)      <span class="cm"># aggregate by key ✓ preferred</span>
+rdd.<span class="fn">mapValues</span>(<span class="kw">lambda</span> v: v*<span class="num">2</span>)          <span class="cm"># map only values</span>
+rdd.<span class="fn">union</span>(rdd2)                        <span class="cm"># concatenate two RDDs</span>
+rdd.<span class="fn">join</span>(rdd2)                         <span class="cm"># inner join on key</span>
+rdd.<span class="fn">repartition</span>(<span class="num">8</span>)                    <span class="cm"># reshuffle to N partitions</span>
+rdd.<span class="fn">coalesce</span>(<span class="num">2</span>)                       <span class="cm"># reduce partitions (no shuffle)</span></pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">RDD Actions (Trigger Execution)</div>
+      <div class="code-wrap">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre>rdd.<span class="fn">collect</span>()          <span class="cm"># return ALL data to driver ⚠️ use with care</span>
+rdd.<span class="fn">count</span>()            <span class="cm"># count elements</span>
+rdd.<span class="fn">first</span>()            <span class="cm"># first element</span>
+rdd.<span class="fn">take</span>(<span class="num">5</span>)            <span class="cm"># first N elements</span>
+rdd.<span class="fn">top</span>(<span class="num">3</span>)             <span class="cm"># largest N elements</span>
+rdd.<span class="fn">reduce</span>(<span class="kw">lambda</span> a,b: a+b)  <span class="cm"># reduce to single value</span>
+rdd.<span class="fn">sum</span>()              <span class="cm"># sum of elements</span>
+rdd.<span class="fn">mean</span>()             <span class="cm"># average</span>
+rdd.<span class="fn">max</span>() / rdd.<span class="fn">min</span>() <span class="cm"># max / min</span>
+rdd.<span class="fn">countByKey</span>()       <span class="cm"># count per key (key,val) RDDs</span>
+rdd.<span class="fn">saveAsTextFile</span>(<span class="str">"path"</span>) <span class="cm"># write to disk</span>
+rdd.<span class="fn">foreach</span>(<span class="kw">lambda</span> x: <span class="fn">print</span>(x)) <span class="cm"># execute func on each</span></pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Try It: map + filter simulation</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Enter comma-separated numbers, choose operation:</p>
+      <input class="demo-input" id="rddInput" type="text" value="1,2,3,4,5,6,7,8,9,10" placeholder="e.g. 1,2,3,4,5">
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+        <button class="run-btn" onclick="rddDemo('double')">map(×2)</button>
+        <button class="run-btn" onclick="rddDemo('square')">map(x²)</button>
+        <button class="run-btn" onclick="rddDemo('even')">filter(even)</button>
+        <button class="run-btn" onclick="rddDemo('odd')">filter(odd)</button>
+        <button class="run-btn" onclick="rddDemo('sum')">reduce(sum)</button>
+      </div>
+      <div class="demo-output" id="rddOutput">→ result will appear here</div>
+    </div>
+  </div>
+
+  <!-- ===== DATAFRAMES ===== -->
+  <div class="section" id="tab-dataframes">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Creating DataFrames</div>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre><span class="cm"># From list of dicts / tuples</span>
+data = [(<span class="str">"Alice"</span>, <span class="num">30</span>), (<span class="str">"Bob"</span>, <span class="num">25</span>)]
+df = spark.<span class="fn">createDataFrame</span>(data, [<span class="str">"name"</span>, <span class="str">"age"</span>])
+
+<span class="cm"># From CSV / JSON / Parquet</span>
+df = spark.read.<span class="fn">csv</span>(<span class="str">"file.csv"</span>, header=<span class="kw">True</span>, inferSchema=<span class="kw">True</span>)
+df = spark.read.<span class="fn">json</span>(<span class="str">"file.json"</span>)
+df = spark.read.<span class="fn">parquet</span>(<span class="str">"file.parquet"</span>)
+
+<span class="cm"># With explicit schema</span>
+<span class="kw">from</span> pyspark.sql.types <span class="kw">import</span> *
+schema = <span class="cls">StructType</span>([
+    <span class="cls">StructField</span>(<span class="str">"name"</span>, <span class="cls">StringType</span>(), nullable=<span class="kw">True</span>),
+    <span class="cls">StructField</span>(<span class="str">"age"</span>, <span class="cls">IntegerType</span>(), nullable=<span class="kw">False</span>)
+])</pre>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Inspect & Explore</div>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>df.<span class="fn">show</span>(<span class="num">10</span>)               <span class="cm"># print first 10 rows</span>
+df.<span class="fn">show</span>(truncate=<span class="kw">False</span>)  <span class="cm"># full column values</span>
+df.<span class="fn">printSchema</span>()         <span class="cm"># column types tree</span>
+df.<span class="fn">describe</span>().<span class="fn">show</span>()    <span class="cm"># summary stats</span>
+df.<span class="fn">dtypes</span>                <span class="cm"># list of (col, type)</span>
+df.<span class="fn">columns</span>               <span class="cm"># list of column names</span>
+df.<span class="fn">count</span>()               <span class="cm"># row count (action)</span>
+df.<span class="fn">schema</span>                <span class="cm"># StructType object</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Core DataFrame Operations</div>
+      <div class="code-wrap">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> F
+
+<span class="cm"># Select columns</span>
+df.<span class="fn">select</span>(<span class="str">"name"</span>, <span class="str">"age"</span>)
+df.<span class="fn">select</span>(F.<span class="fn">col</span>(<span class="str">"age"</span>) * <span class="num">2</span>)
+
+<span class="cm"># Filter rows</span>
+df.<span class="fn">filter</span>(df.age > <span class="num">18</span>)
+df.<span class="fn">where</span>(<span class="str">"age > 18 AND name LIKE 'A%'"</span>)
+
+<span class="cm"># Add / rename columns</span>
+df.<span class="fn">withColumn</span>(<span class="str">"senior"</span>, df.age > <span class="num">60</span>)
+df.<span class="fn">withColumnRenamed</span>(<span class="str">"name"</span>, <span class="str">"full_name"</span>)
+df.<span class="fn">drop</span>(<span class="str">"unwanted_col"</span>)
+
+<span class="cm"># Aggregations</span>
+df.<span class="fn">groupBy</span>(<span class="str">"dept"</span>).<span class="fn">agg</span>(
+    F.<span class="fn">count</span>(<span class="str">"*"</span>).<span class="fn">alias</span>(<span class="str">"count"</span>),
+    F.<span class="fn">avg</span>(<span class="str">"salary"</span>).<span class="fn">alias</span>(<span class="str">"avg_salary"</span>),
+    F.<span class="fn">max</span>(<span class="str">"salary"</span>).<span class="fn">alias</span>(<span class="str">"max_salary"</span>)
+)
+
+<span class="cm"># Sorting</span>
+df.<span class="fn">orderBy</span>(df.age.<span class="fn">desc</span>())
+df.<span class="fn">sort</span>(F.<span class="fn">col</span>(<span class="str">"salary"</span>).<span class="fn">desc</span>())</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Joins</div>
+      <div class="code-wrap">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="cm"># Inner join (default)</span>
+df1.<span class="fn">join</span>(df2, on=<span class="str">"id"</span>)
+df1.<span class="fn">join</span>(df2, on=df1.id == df2.emp_id, how=<span class="str">"inner"</span>)
+
+<span class="cm"># All join types:</span>
+<span class="cm"># "inner", "left", "right", "outer", "left_semi",</span>
+<span class="cm"># "left_anti", "cross"</span>
+
+df1.<span class="fn">join</span>(df2, on=[<span class="str">"dept"</span>, <span class="str">"year"</span>], how=<span class="str">"left"</span>)
+
+<span class="cm"># Broadcast join (small table)</span>
+<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> broadcast
+big_df.<span class="fn">join</span>(<span class="fn">broadcast</span>(small_df), on=<span class="str">"key"</span>)</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Writing DataFrames</div>
+      <div class="code-wrap">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre>df.<span class="fn">write</span>.<span class="fn">csv</span>(<span class="str">"output/"</span>, header=<span class="kw">True</span>, mode=<span class="str">"overwrite"</span>)
+df.<span class="fn">write</span>.<span class="fn">parquet</span>(<span class="str">"output.parquet"</span>)
+df.<span class="fn">write</span>.<span class="fn">json</span>(<span class="str">"output.json"</span>)
+df.<span class="fn">write</span>.<span class="fn">partitionBy</span>(<span class="str">"year"</span>, <span class="str">"month"</span>).<span class="fn">parquet</span>(<span class="str">"out/"</span>)
+
+<span class="cm"># Modes: "overwrite", "append", "ignore", "error" (default)</span>
+df.<span class="fn">write</span>.<span class="fn">mode</span>(<span class="str">"append"</span>).<span class="fn">parquet</span>(<span class="str">"output/"</span>)</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TRANSFORMS ===== -->
+  <div class="section" id="tab-transforms">
+    <div class="card">
+      <div class="card-title">Built-in Functions (pyspark.sql.functions)</div>
+      <div class="code-wrap">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="kw">from</span> pyspark.sql <span class="kw">import</span> functions <span class="kw">as</span> F
+
+<span class="cm"># String</span>
+F.<span class="fn">upper</span>(<span class="str">"col"</span>), F.<span class="fn">lower</span>(<span class="str">"col"</span>), F.<span class="fn">trim</span>(<span class="str">"col"</span>)
+F.<span class="fn">concat</span>(c1, c2), F.<span class="fn">concat_ws</span>(<span class="str">","</span>, c1, c2)
+F.<span class="fn">length</span>(<span class="str">"col"</span>), F.<span class="fn">regexp_replace</span>(col, pattern, repl)
+F.<span class="fn">split</span>(<span class="str">"col"</span>, <span class="str">","</span>), F.<span class="fn">substring</span>(<span class="str">"col"</span>, <span class="num">1</span>, <span class="num">3</span>)
+
+<span class="cm"># Numeric</span>
+F.<span class="fn">round</span>(col, <span class="num">2</span>), F.<span class="fn">abs</span>(col), F.<span class="fn">sqrt</span>(col)
+F.<span class="fn">floor</span>(col), F.<span class="fn">ceil</span>(col), F.<span class="fn">log</span>(col)
+
+<span class="cm"># Date / Time</span>
+F.<span class="fn">current_date</span>(), F.<span class="fn">current_timestamp</span>()
+F.<span class="fn">datediff</span>(end, start), F.<span class="fn">date_add</span>(col, days)
+F.<span class="fn">year</span>(col), F.<span class="fn">month</span>(col), F.<span class="fn">dayofweek</span>(col)
+F.<span class="fn">to_date</span>(col, <span class="str">"yyyy-MM-dd"</span>)
+F.<span class="fn">date_format</span>(col, <span class="str">"MM/dd/yyyy"</span>)
+
+<span class="cm"># Null handling</span>
+F.<span class="fn">isNull</span>(col), F.<span class="fn">isNotNull</span>(col)
+F.<span class="fn">coalesce</span>(c1, c2, c3)      <span class="cm"># first non-null</span>
+F.<span class="fn">when</span>(cond, val).<span class="fn">otherwise</span>(default)</pre>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Window Functions</div>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre><span class="kw">from</span> pyspark.sql.window <span class="kw">import</span> <span class="cls">Window</span>
+<span class="kw">import</span> pyspark.sql.functions <span class="kw">as</span> F
+
+w = <span class="cls">Window</span>.<span class="fn">partitionBy</span>(<span class="str">"dept"</span>) \
+           .<span class="fn">orderBy</span>(<span class="str">"salary"</span>)
+
+<span class="cm"># Ranking</span>
+df.<span class="fn">withColumn</span>(<span class="str">"rank"</span>, F.<span class="fn">rank</span>().<span class="fn">over</span>(w))
+df.<span class="fn">withColumn</span>(<span class="str">"dense"</span>, F.<span class="fn">dense_rank</span>().<span class="fn">over</span>(w))
+df.<span class="fn">withColumn</span>(<span class="str">"row_n"</span>, F.<span class="fn">row_number</span>().<span class="fn">over</span>(w))
+
+<span class="cm"># Lag / Lead</span>
+df.<span class="fn">withColumn</span>(<span class="str">"prev"</span>, F.<span class="fn">lag</span>(<span class="str">"salary"</span>, <span class="num">1</span>).<span class="fn">over</span>(w))
+df.<span class="fn">withColumn</span>(<span class="str">"next"</span>, F.<span class="fn">lead</span>(<span class="str">"salary"</span>, <span class="num">1</span>).<span class="fn">over</span>(w))
+
+<span class="cm"># Running total</span>
+w2 = <span class="cls">Window</span>.<span class="fn">partitionBy</span>(<span class="str">"dept"</span>) \
+            .<span class="fn">orderBy</span>(<span class="str">"date"</span>) \
+            .<span class="fn">rowsBetween</span>(<span class="cls">Window</span>.unboundedPreceding, <span class="num">0</span>)
+df.<span class="fn">withColumn</span>(<span class="str">"running"</span>, F.<span class="fn">sum</span>(<span class="str">"sales"</span>).<span class="fn">over</span>(w2))</pre>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">UDFs</div>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre><span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> udf
+<span class="kw">from</span> pyspark.sql.types <span class="kw">import</span> StringType
+
+<span class="cm"># Register UDF</span>
+<span class="kw">def</span> <span class="fn">grade</span>(score):
+    <span class="kw">if</span> score >= <span class="num">90</span>: <span class="kw">return</span> <span class="str">"A"</span>
+    <span class="kw">elif</span> score >= <span class="num">70</span>: <span class="kw">return</span> <span class="str">"B"</span>
+    <span class="kw">else</span>: <span class="kw">return</span> <span class="str">"C"</span>
+
+grade_udf = <span class="fn">udf</span>(grade, <span class="cls">StringType</span>())
+df.<span class="fn">withColumn</span>(<span class="str">"grade"</span>, grade_udf(<span class="str">"score"</span>))
+
+<span class="cm"># Pandas UDF (vectorised — faster!)</span>
+<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> pandas_udf
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+@<span class="fn">pandas_udf</span>(<span class="cls">StringType</span>())
+<span class="kw">def</span> <span class="fn">upper_udf</span>(s: pd.Series) -> pd.Series:
+    <span class="kw">return</span> s.str.upper()
+
+df.<span class="fn">withColumn</span>(<span class="str">"upper"</span>, <span class="fn">upper_udf</span>(<span class="str">"name"</span>))</pre>
+        </div>
+        <div style="margin-top:10px;padding:10px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:8px;">
+          <p style="font-size:12px;color:var(--yellow);">⚠️ Avoid regular UDFs when possible — they serialize data through Python, killing Catalyst optimizations. Use Pandas UDFs for large-scale transforms.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Pivot & Unpivot</div>
+      <div class="code-wrap">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="cm"># Pivot</span>
+df.<span class="fn">groupBy</span>(<span class="str">"dept"</span>).<span class="fn">pivot</span>(<span class="str">"quarter"</span>).<span class="fn">sum</span>(<span class="str">"revenue"</span>)
+
+<span class="cm"># Pivot with specific values (faster)</span>
+df.<span class="fn">groupBy</span>(<span class="str">"dept"</span>).<span class="fn">pivot</span>(<span class="str">"quarter"</span>, [<span class="str">"Q1"</span>,<span class="str">"Q2"</span>,<span class="str">"Q3"</span>,<span class="str">"Q4"</span>]) \
+  .<span class="fn">agg</span>(F.<span class="fn">sum</span>(<span class="str">"revenue"</span>))
+
+<span class="cm"># Stack / melt (unpivot) — use stack expression</span>
+df.<span class="fn">selectExpr</span>(<span class="str">"id"</span>, <span class="str">"stack(2,'Q1',Q1,'Q2',Q2) as (quarter,rev)"</span>)</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SPARK SQL ===== -->
+  <div class="section" id="tab-sql">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">SQL with Spark</div>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre><span class="cm"># Register temp view</span>
+df.<span class="fn">createOrReplaceTempView</span>(<span class="str">"employees"</span>)
+df.<span class="fn">createOrReplaceGlobalTempView</span>(<span class="str">"emps"</span>)
+
+<span class="cm"># Run SQL</span>
+result = spark.<span class="fn">sql</span>(<span class="str">"""
+    SELECT dept,
+           COUNT(*) AS headcount,
+           AVG(salary) AS avg_sal,
+           MAX(salary) AS max_sal
+    FROM employees
+    WHERE hire_date > '2020-01-01'
+    GROUP BY dept
+    ORDER BY avg_sal DESC
+"""</span>)
+
+<span class="cm"># Global temp views (across sessions)</span>
+spark.<span class="fn">sql</span>(<span class="str">"SELECT * FROM global_temp.emps"</span>)
+
+<span class="cm"># List / drop views</span>
+spark.<span class="fn">catalog</span>.<span class="fn">listTables</span>()
+spark.<span class="fn">catalog</span>.<span class="fn">dropTempView</span>(<span class="str">"employees"</span>)</pre>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">SQL vs DataFrame API</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Both compile to the same execution plan via Catalyst!</p>
+        <table class="compare-table">
+          <tr><th>SQL</th><th>DataFrame API</th></tr>
+          <tr><td>SELECT col FROM t</td><td>df.select("col")</td></tr>
+          <tr><td>WHERE age &gt; 18</td><td>df.filter(df.age > 18)</td></tr>
+          <tr><td>GROUP BY dept</td><td>df.groupBy("dept")</td></tr>
+          <tr><td>ORDER BY sal DESC</td><td>df.orderBy(col.desc())</td></tr>
+          <tr><td>JOIN ... ON</td><td>df1.join(df2, on=...)</td></tr>
+          <tr><td>LIMIT 10</td><td>df.limit(10)</td></tr>
+          <tr><td>DISTINCT</td><td>df.distinct()</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">SQL Interactive Tester</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Simulate query results on a sample dataset (client-side demo):</p>
+      <select id="sqlExample" onchange="loadSqlExample()" style="width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--display);font-size:13px;margin-bottom:10px;outline:none;">
+        <option value="basic">Basic SELECT with WHERE</option>
+        <option value="groupby">GROUP BY with aggregations</option>
+        <option value="window">Window function (RANK)</option>
+        <option value="subquery">Subquery example</option>
+      </select>
+      <div class="code-wrap">
+        <pre id="sqlExampleCode" style="margin:0;"></pre>
+      </div>
+      <button class="run-btn" style="margin-top:10px;" onclick="runSqlExample()">▶ Execute</button>
+      <div id="sqlResult" style="margin-top:12px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== STREAMING ===== -->
+  <div class="section" id="tab-streaming">
+    <div class="card">
+      <div class="card-title">Structured Streaming Basics</div>
+      <div class="code-wrap">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="cm"># Read from Kafka</span>
+stream_df = spark.readStream \
+    .<span class="fn">format</span>(<span class="str">"kafka"</span>) \
+    .<span class="fn">option</span>(<span class="str">"kafka.bootstrap.servers"</span>, <span class="str">"host:9092"</span>) \
+    .<span class="fn">option</span>(<span class="str">"subscribe"</span>, <span class="str">"events_topic"</span>) \
+    .<span class="fn">load</span>()
+
+<span class="cm"># Read from file (auto-detects new files)</span>
+stream_df = spark.readStream \
+    .<span class="fn">schema</span>(schema) \
+    .<span class="fn">json</span>(<span class="str">"input_dir/"</span>)
+
+<span class="cm"># Transform stream like a DataFrame!</span>
+result = stream_df \
+    .<span class="fn">groupBy</span>(F.<span class="fn">window</span>(<span class="str">"timestamp"</span>, <span class="str">"10 minutes"</span>), <span class="str">"category"</span>) \
+    .<span class="fn">count</span>()
+
+<span class="cm"># Write stream</span>
+query = result.writeStream \
+    .<span class="fn">outputMode</span>(<span class="str">"update"</span>) \
+    .<span class="fn">format</span>(<span class="str">"console"</span>) \
+    .<span class="fn">trigger</span>(processingTime=<span class="str">"1 minute"</span>) \
+    .<span class="fn">start</span>()
+
+query.<span class="fn">awaitTermination</span>()</pre>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Output Modes</div>
+        <div class="expand-item">
+          <div class="expand-header" onclick="toggleExpand(this)">
+            <span><span class="tag tag-green">Append</span></div>
+          <div class="expand-icon">+</div>
+          </div>
+          <div class="expand-body">Only newly added rows are written. Use for simple transforms without aggregation. Default mode.</div>
+        </div>
+        <div class="expand-item">
+          <div class="expand-header" onclick="toggleExpand(this)">
+            <span><span class="tag tag-blue">Complete</span></div>
+          <div class="expand-icon">+</div>
+          </div>
+          <div class="expand-body">Full result table is rewritten each trigger. Required for aggregations without watermark. Expensive for large datasets.</div>
+        </div>
+        <div class="expand-item">
+          <div class="expand-header" onclick="toggleExpand(this)">
+            <span><span class="tag tag-orange">Update</span></div>
+          <div class="expand-icon">+</div>
+          </div>
+          <div class="expand-body">Only changed rows are written. Efficient for aggregations with watermark. Not supported for sorted output.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Live Stream Simulation</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">Simulated micro-batch processing:</p>
+        <button class="run-btn" onclick="startStreamDemo()">▶ Start stream</button>
+        <button class="run-btn" style="background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.2);color:var(--red);margin-left:8px;" onclick="stopStream()">■ Stop</button>
+        <div class="stream-demo" id="streamDemo" style="margin-top:12px;max-height:180px;overflow-y:auto;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== OPTIMIZATION ===== -->
+  <div class="section" id="tab-optimization">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Caching & Persistence</div>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre><span class="kw">from</span> pyspark <span class="kw">import</span> StorageLevel
+
+df.<span class="fn">cache</span>()           <span class="cm"># MEMORY_AND_DISK</span>
+df.<span class="fn">persist</span>()         <span class="cm"># same as cache()</span>
+df.<span class="fn">unpersist</span>()       <span class="cm"># free memory</span>
+
+<span class="cm"># Custom storage levels</span>
+df.<span class="fn">persist</span>(StorageLevel.MEMORY_ONLY)
+df.<span class="fn">persist</span>(StorageLevel.MEMORY_AND_DISK)
+df.<span class="fn">persist</span>(StorageLevel.DISK_ONLY)
+df.<span class="fn">persist</span>(StorageLevel.OFF_HEAP)
+
+<span class="cm"># When to cache:</span>
+<span class="cm"># ✓ DataFrame used 2+ times in pipeline</span>
+<span class="cm"># ✓ After expensive join / aggregation</span>
+<span class="cm"># ✗ Single-use DataFrames</span></pre>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Broadcast & Skew</div>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre><span class="cm"># Broadcast small table (&lt; ~10MB)</span>
+<span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> broadcast
+
+result = big.<span class="fn">join</span>(<span class="fn">broadcast</span>(small), <span class="str">"key"</span>)
+
+<span class="cm"># AQE (Spark 3+) — auto-broadcasts</span>
+spark.<span class="fn">conf</span>.<span class="fn">set</span>(<span class="str">"spark.sql.adaptive.enabled"</span>, <span class="kw">True</span>)
+
+<span class="cm"># Handle data skew with salting</span>
+<span class="kw">import</span> random
+df.<span class="fn">withColumn</span>(<span class="str">"salt"</span>,
+    (F.<span class="fn">rand</span>() * <span class="num">10</span>).<span class="fn">cast</span>(<span class="str">"int"</span>))
+    
+<span class="cm"># Repartition by column</span>
+df.<span class="fn">repartition</span>(<span class="num">200</span>, <span class="str">"user_id"</span>)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Catalyst Optimizer — Query Planning</div>
+      <div class="arch-diagram" style="flex-direction:row;gap:6px;justify-content:center;flex-wrap:wrap;padding:16px 0;">
+        <div style="text-align:center;">
+          <div class="arch-node arch-driver" style="min-width:120px;padding:8px 14px;font-size:12px;">Unresolved<br>Logical Plan</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;">AST</div>
+        </div>
+        <div style="display:flex;align-items:center;color:var(--text3);font-size:18px;">→</div>
+        <div style="text-align:center;">
+          <div class="arch-node arch-cluster" style="min-width:120px;padding:8px 14px;font-size:12px;">Resolved<br>Logical Plan</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;">Analysis</div>
+        </div>
+        <div style="display:flex;align-items:center;color:var(--text3);font-size:18px;">→</div>
+        <div style="text-align:center;">
+          <div class="arch-node arch-executor" style="min-width:120px;padding:8px 14px;font-size:12px;">Optimized<br>Logical Plan</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;">Catalyst</div>
+        </div>
+        <div style="display:flex;align-items:center;color:var(--text3);font-size:18px;">→</div>
+        <div style="text-align:center;">
+          <div class="arch-node arch-task" style="min-width:120px;padding:8px 14px;font-size:12px;">Physical<br>Plans</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;">Cost-based</div>
+        </div>
+        <div style="display:flex;align-items:center;color:var(--text3);font-size:18px;">→</div>
+        <div style="text-align:center;">
+          <div class="arch-node" style="background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);color:var(--purple);min-width:120px;padding:8px 14px;font-size:12px;">Bytecode<br>(Tungsten)</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;">Code Gen</div>
+        </div>
+      </div>
+      <div class="code-wrap" style="margin-top:12px;">
+        <pre><span class="cm"># Inspect execution plans</span>
+df.<span class="fn">explain</span>()            <span class="cm"># physical plan</span>
+df.<span class="fn">explain</span>(<span class="kw">True</span>)        <span class="cm"># all 4 plans</span>
+df.<span class="fn">explain</span>(<span class="str">"cost"</span>)      <span class="cm"># with cost estimates</span>
+df.<span class="fn">explain</span>(<span class="str">"formatted"</span>) <span class="cm"># Spark 3+ readable</span></pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Configuration Tuning</div>
+      <div class="code-wrap">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre><span class="cm"># Shuffle partitions (default 200, tune for your data)</span>
+spark.<span class="fn">conf</span>.<span class="fn">set</span>(<span class="str">"spark.sql.shuffle.partitions"</span>, <span class="str">"400"</span>)
+
+<span class="cm"># Adaptive Query Execution (Spark 3+)</span>
+spark.<span class="fn">conf</span>.<span class="fn">set</span>(<span class="str">"spark.sql.adaptive.enabled"</span>, <span class="kw">True</span>)
+spark.<span class="fn">conf</span>.<span class="fn">set</span>(<span class="str">"spark.sql.adaptive.coalescePartitions.enabled"</span>, <span class="kw">True</span>)
+spark.<span class="fn">conf</span>.<span class="fn">set</span>(<span class="str">"spark.sql.adaptive.skewJoin.enabled"</span>, <span class="kw">True</span>)
+
+<span class="cm"># Executor sizing</span>
+spark.<span class="fn">conf</span>.<span class="fn">set</span>(<span class="str">"spark.executor.cores"</span>, <span class="str">"4"</span>)
+spark.<span class="fn">conf</span>.<span class="fn">set</span>(<span class="str">"spark.executor.memory"</span>, <span class="str">"8g"</span>)
+
+<span class="cm"># Serialization</span>
+spark.<span class="fn">conf</span>.<span class="fn">set</span>(<span class="str">"spark.serializer"</span>, <span class="str">"org.apache.spark.serializer.KryoSerializer"</span>)</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHEAT SHEET ===== -->
+  <div class="section" id="tab-cheatsheet">
+    <input class="search-box" type="text" id="cheatSearch" placeholder="🔍  Search methods, functions..." oninput="filterCheat(this.value)">
+    <div id="cheatContent">
+      <div class="card cheat-section">
+        <div class="cheat-section-title">SparkSession / Context</div>
+        <div class="cheat-row"><span class="cheat-code">SparkSession.builder.getOrCreate()</span><span class="cheat-desc">Create or fetch existing session</span></div>
+        <div class="cheat-row"><span class="cheat-code">spark.sparkContext</span><span class="cheat-desc">Underlying SparkContext</span></div>
+        <div class="cheat-row"><span class="cheat-code">spark.version</span><span class="cheat-desc">Spark version string</span></div>
+        <div class="cheat-row"><span class="cheat-code">spark.conf.set(k, v)</span><span class="cheat-desc">Set runtime config</span></div>
+        <div class="cheat-row"><span class="cheat-code">spark.stop()</span><span class="cheat-desc">Shutdown session</span></div>
+      </div>
+      <div class="card cheat-section">
+        <div class="cheat-section-title">Reading Data</div>
+        <div class="cheat-row"><span class="cheat-code">spark.read.csv(path, header=True)</span><span class="cheat-desc">CSV with header</span></div>
+        <div class="cheat-row"><span class="cheat-code">spark.read.parquet(path)</span><span class="cheat-desc">Parquet (columnar, fast)</span></div>
+        <div class="cheat-row"><span class="cheat-code">spark.read.json(path)</span><span class="cheat-desc">JSON lines format</span></div>
+        <div class="cheat-row"><span class="cheat-code">spark.read.orc(path)</span><span class="cheat-desc">ORC format</span></div>
+        <div class="cheat-row"><span class="cheat-code">spark.read.format("delta").load()</span><span class="cheat-desc">Delta Lake table</span></div>
+        <div class="cheat-row"><span class="cheat-code">spark.read.table("db.table")</span><span class="cheat-desc">Hive / Catalog table</span></div>
+      </div>
+      <div class="card cheat-section">
+        <div class="cheat-section-title">DataFrame Transforms</div>
+        <div class="cheat-row"><span class="cheat-code">df.select(*cols)</span><span class="cheat-desc">Project columns</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.filter(condition)</span><span class="cheat-desc">Row predicate</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.withColumn(name, expr)</span><span class="cheat-desc">Add/replace column</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.drop(*cols)</span><span class="cheat-desc">Remove columns</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.distinct()</span><span class="cheat-desc">Deduplicate rows</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.dropDuplicates([cols])</span><span class="cheat-desc">Deduplicate by columns</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.fillna(val, subset)</span><span class="cheat-desc">Replace nulls</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.dropna(how, subset)</span><span class="cheat-desc">Drop rows with nulls</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.replace(to_replace, val)</span><span class="cheat-desc">Replace values</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.sample(fraction, seed)</span><span class="cheat-desc">Random sample</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.limit(n)</span><span class="cheat-desc">First N rows</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.union(df2)</span><span class="cheat-desc">Vertical concat (by position)</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.unionByName(df2)</span><span class="cheat-desc">Vertical concat (by name)</span></div>
+      </div>
+      <div class="card cheat-section">
+        <div class="cheat-section-title">Aggregation Functions</div>
+        <div class="cheat-row"><span class="cheat-code">F.count("*") / F.count("col")</span><span class="cheat-desc">Count rows / non-null</span></div>
+        <div class="cheat-row"><span class="cheat-code">F.sum, F.avg, F.mean</span><span class="cheat-desc">Numeric aggregations</span></div>
+        <div class="cheat-row"><span class="cheat-code">F.min, F.max</span><span class="cheat-desc">Range values</span></div>
+        <div class="cheat-row"><span class="cheat-code">F.countDistinct("col")</span><span class="cheat-desc">Distinct count</span></div>
+        <div class="cheat-row"><span class="cheat-code">F.collect_list("col")</span><span class="cheat-desc">Group values to list (with dups)</span></div>
+        <div class="cheat-row"><span class="cheat-code">F.collect_set("col")</span><span class="cheat-desc">Group values to set (no dups)</span></div>
+        <div class="cheat-row"><span class="cheat-code">F.first("col"), F.last("col")</span><span class="cheat-desc">First / last value in group</span></div>
+        <div class="cheat-row"><span class="cheat-code">F.percentile_approx(col, 0.5)</span><span class="cheat-desc">Approximate percentile / median</span></div>
+        <div class="cheat-row"><span class="cheat-code">F.stddev(col), F.variance(col)</span><span class="cheat-desc">Standard deviation / variance</span></div>
+      </div>
+      <div class="card cheat-section">
+        <div class="cheat-section-title">Actions</div>
+        <div class="cheat-row"><span class="cheat-code">df.show(n, truncate)</span><span class="cheat-desc">Print rows to console</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.collect()</span><span class="cheat-desc">Return all rows as list</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.take(n)</span><span class="cheat-desc">First n rows as list</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.count()</span><span class="cheat-desc">Row count</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.first()</span><span class="cheat-desc">First Row object</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.toPandas()</span><span class="cheat-desc">Convert to Pandas DataFrame</span></div>
+        <div class="cheat-row"><span class="cheat-code">df.write.parquet(path)</span><span class="cheat-desc">Save to Parquet</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <div class="section" id="tab-quiz">
+    <div class="quiz-container">
+      <div id="quizGame">
+        <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="qProgressFill"></div></div>
+        <div class="quiz-meta">
+          <span id="qCounter">Question 1 of 12</span>
+          <span id="qScoreDisplay">Score: 0</span>
+        </div>
+        <div class="card">
+          <div class="quiz-question" id="quizQuestion"></div>
+          <div class="quiz-options" id="quizOptions"></div>
+          <div class="quiz-feedback" id="quizFeedback"></div>
+          <div class="quiz-nav">
+            <div id="quizHint" style="font-size:12px;color:var(--text3);"></div>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none;">Next →</button>
+          </div>
+        </div>
+      </div>
+      <div id="quizResults" style="display:none;">
+        <div class="quiz-score-card">
+          <div style="font-size:14px;color:var(--text2);">Quiz complete!</div>
+          <div class="score-big" id="finalScore"></div>
+          <div class="score-msg" id="scoreMsg"></div>
+          <div style="margin-top:24px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="restartQuiz()">Retake quiz</button>
+            <button class="btn btn-ghost" onclick="showTab('cheatsheet')">Review cheat sheet</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<footer>PySpark Interactive Revision Guide · Built for learning</footer>
+
+<script>
+const visited = new Set();
+const totalTabs = 8;
+let quizScore = 0;
+let quizIndex = 0;
+let quizAnswered = false;
+let streamInterval = null;
+let batchNum = 0;
+
+function showTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+  visited.add(name);
+  updateProgress();
+  if (name === 'quiz') initQuiz();
+}
+
+function updateProgress() {
+  const pct = Math.round((visited.size / totalTabs) * 100);
+  document.getElementById('globalProgress').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('visitedCount').textContent = visited.size;
+  visited.add('overview');
+}
+
+// Partition demo
+const allData = [1,2,3,4,5,6,7,8,9,10,11,12];
+function updatePartitions(n) {
+  document.getElementById('partVal').textContent = n;
+  const wrap = document.getElementById('partitionsWrap');
+  wrap.innerHTML = '';
+  const size = Math.ceil(allData.length / n);
+  for (let i = 0; i < n; i++) {
+    const chunk = allData.slice(i * size, (i + 1) * size);
+    const div = document.createElement('div');
+    div.className = 'partition-box';
+    div.innerHTML = `<div class="partition-num">P${i}</div><div class="partition-items">[${chunk.join(',')}]</div>`;
+    wrap.appendChild(div);
+  }
+}
+updatePartitions(3);
+
+// Pipeline info
+function showPipeInfo(name, desc) {
+  const el = document.getElementById('pipeInfo');
+  el.textContent = name + '() — ' + desc;
+  el.style.display = 'block';
+}
+
+// RDD Demo
+function rddDemo(op) {
+  const raw = document.getElementById('rddInput').value;
+  const nums = raw.split(',').map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
+  let result = '';
+  if (op === 'double') result = `map(lambda x: x*2)\n→ [${nums.map(x=>x*2).join(', ')}]`;
+  else if (op === 'square') result = `map(lambda x: x**2)\n→ [${nums.map(x=>x*x).join(', ')}]`;
+  else if (op === 'even') result = `filter(lambda x: x%2==0)\n→ [${nums.filter(x=>x%2===0).join(', ')}]`;
+  else if (op === 'odd') result = `filter(lambda x: x%2!=0)\n→ [${nums.filter(x=>x%2!==0).join(', ')}]`;
+  else if (op === 'sum') result = `reduce(lambda a,b: a+b)\n→ ${nums.reduce((a,b)=>a+b,0)}`;
+  document.getElementById('rddOutput').textContent = result;
+}
+
+// Copy code
+function copyCode(btn) {
+  const pre = btn.nextElementSibling;
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+// Expandable
+function toggleExpand(header) {
+  const body = header.nextElementSibling;
+  const icon = header.querySelector('.expand-icon');
+  body.classList.toggle('open');
+  icon.classList.toggle('open');
+}
+
+// SQL examples
+const sqlExamples = {
+  basic: {
+    code: `SELECT name, dept, salary\nFROM employees\nWHERE salary > 50000\n  AND dept = 'Engineering'\nORDER BY salary DESC\nLIMIT 5;`,
+    rows: [
+      ['Alice Chen','Engineering','95000'],
+      ['Bob Kumar','Engineering','88000'],
+      ['Priya S.','Engineering','76000'],
+      ['Dev M.','Engineering','72000'],
+      ['Sam T.','Engineering','65000'],
+    ],
+    cols: ['name','dept','salary']
+  },
+  groupby: {
+    code: `SELECT dept,\n       COUNT(*) AS headcount,\n       ROUND(AVG(salary),0) AS avg_sal,\n       MAX(salary) AS max_sal\nFROM employees\nGROUP BY dept\nORDER BY avg_sal DESC;`,
+    rows: [['Engineering','42','85000','210000'],['Data','18','79000','190000'],['Product','25','72000','150000'],['Design','12','68000','120000']],
+    cols: ['dept','headcount','avg_sal','max_sal']
+  },
+  window: {
+    code: `SELECT name, dept, salary,\n       RANK() OVER (\n         PARTITION BY dept\n         ORDER BY salary DESC\n       ) AS dept_rank\nFROM employees;`,
+    rows: [['Alice','Engineering','95000','1'],['Bob','Engineering','88000','2'],['Priya','Engineering','76000','3'],['Raj','Data','95000','1'],['Meera','Data','88000','2']],
+    cols: ['name','dept','salary','dept_rank']
+  },
+  subquery: {
+    code: `SELECT name, salary\nFROM employees\nWHERE salary > (\n  SELECT AVG(salary)\n  FROM employees\n)\nORDER BY salary DESC;`,
+    rows: [['Alice','95000'],['Bob','88000'],['Raj','95000'],['Priya','76000']],
+    cols: ['name','salary']
+  }
+};
+
+function loadSqlExample() {
+  const key = document.getElementById('sqlExample').value;
+  document.getElementById('sqlExampleCode').textContent = sqlExamples[key].code;
+  document.getElementById('sqlResult').innerHTML = '';
+}
+loadSqlExample();
+
+function runSqlExample() {
+  const key = document.getElementById('sqlExample').value;
+  const ex = sqlExamples[key];
+  let html = `<table style="width:100%;border-collapse:collapse;font-size:12.5px;font-family:var(--mono);">`;
+  html += `<tr>${ex.cols.map(c=>`<th style="text-align:left;padding:6px 12px;border-bottom:1px solid var(--border2);color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;">${c}</th>`).join('')}</tr>`;
+  ex.rows.forEach(r => {
+    html += `<tr>${r.map(v=>`<td style="padding:7px 12px;border-bottom:1px solid var(--border);color:var(--teal);">${v}</td>`).join('')}</tr>`;
+  });
+  html += '</table>';
+  document.getElementById('sqlResult').innerHTML = `<div style="background:var(--code-bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:4px;">${html}</div><div style="font-size:12px;color:var(--text3);margin-top:6px;">${ex.rows.length} rows returned</div>`;
+}
+
+// Streaming demo
+const streamEvents = [
+  ['INFO','Micro-batch 0 started','stream-blue'],
+  ['DATA','{"user":"u1","event":"click","ts":"10:00:01"}','stream-green'],
+  ['DATA','{"user":"u2","event":"view","ts":"10:00:02"}','stream-green'],
+  ['DATA','{"user":"u1","event":"purchase","ts":"10:00:03"}','stream-yellow'],
+  ['AGG', 'Window 10:00-10:10 → click:1 view:1 purchase:1','stream-yellow'],
+  ['INFO','Micro-batch 0 committed (offset: 3)','stream-blue'],
+];
+
+function startStreamDemo() {
+  const demo = document.getElementById('streamDemo');
+  demo.innerHTML = '';
+  batchNum = 0;
+  if (streamInterval) clearInterval(streamInterval);
+  let lineIndex = 0;
+  streamInterval = setInterval(() => {
+    if (lineIndex >= streamEvents.length * 3) { clearInterval(streamInterval); return; }
+    const ev = streamEvents[lineIndex % streamEvents.length];
+    if (lineIndex % streamEvents.length === 0 && lineIndex > 0) {
+      batchNum++;
+      const sep = document.createElement('div');
+      sep.style.cssText = 'border-top:1px dashed var(--border);margin:6px 0;';
+      demo.appendChild(sep);
+    }
+    const div = document.createElement('div');
+    div.className = `stream-line ${ev[2]}`;
+    div.style.animationDelay = '0s';
+    const batch = Math.floor(lineIndex / streamEvents.length);
+    const tag = ev[0] === 'INFO' ? ev[0] : `${ev[0]}[b${batch}]`;
+    div.textContent = `[${tag}] ${ev[1].replace('Micro-batch 0', `Micro-batch ${batch}`)}`;
+    demo.appendChild(div);
+    demo.scrollTop = demo.scrollHeight;
+    lineIndex++;
+  }, 500);
+}
+function stopStream() { if (streamInterval) clearInterval(streamInterval); }
+
+// Cheat sheet filter
+function filterCheat(q) {
+  const rows = document.querySelectorAll('.cheat-row');
+  const sections = document.querySelectorAll('.cheat-section');
+  q = q.toLowerCase();
+  rows.forEach(r => {
+    r.style.display = (!q || r.textContent.toLowerCase().includes(q)) ? '' : 'none';
+  });
+  sections.forEach(s => {
+    const visible = [...s.querySelectorAll('.cheat-row')].some(r => r.style.display !== 'none');
+    s.style.display = visible ? '' : 'none';
+  });
+}
+
+// QUIZ
+const questions = [
+  { q: "What does RDD stand for?", opts: ["Rapidly Distributed Data","Resilient Distributed Dataset","Relational Distributed DataFrame","Remote Data Distribution"], ans: 1, exp: "RDD = Resilient (fault-tolerant), Distributed (across cluster), Dataset (collection of data)." },
+  { q: "Which of these is a Spark ACTION (triggers execution)?", opts: ["filter()","map()","collect()","repartition()"], ans: 2, exp: "collect() sends data back to the driver — it's an action. filter(), map(), repartition() are lazy transformations." },
+  { q: "What is the preferred modern entry point for PySpark?", opts: ["SparkContext","SQLContext","SparkSession","HiveContext"], ans: 2, exp: "SparkSession (introduced Spark 2.0) unifies SparkContext, SQLContext, and HiveContext into one object." },
+  { q: "Which function AVOIDS serializing through Python (faster than regular UDF)?", opts: ["lambda UDF","Standard UDF","Pandas UDF","mapPartitions UDF"], ans: 2, exp: "Pandas UDFs use Apache Arrow for zero-copy data transfer, avoiding Python pickle serialization." },
+  { q: "df.cache() is equivalent to which storage level?", opts: ["MEMORY_ONLY","MEMORY_AND_DISK","DISK_ONLY","OFF_HEAP"], ans: 1, exp: "cache() uses MEMORY_AND_DISK — it stores in memory first, spills to disk if needed." },
+  { q: "Which join type includes only rows with matching keys in BOTH DataFrames?", opts: ["Left join","Right join","Inner join","Cross join"], ans: 2, exp: "Inner join returns only rows where the join key exists in both DataFrames." },
+  { q: "What Spark feature allows it to automatically adjust plans at runtime?", opts: ["Catalyst Optimizer","Tungsten Engine","Adaptive Query Execution (AQE)","Broadcast Join"], ans: 2, exp: "AQE (Spark 3+) dynamically coalesces partitions, converts joins, and handles skew at runtime." },
+  { q: "coalesce(2) vs repartition(2) — what's the key difference?", opts: ["They are identical","coalesce avoids a full shuffle when reducing partitions","repartition can only increase partitions","coalesce requires an action"], ans: 1, exp: "coalesce minimizes data movement by merging existing partitions. repartition always does a full shuffle but produces balanced partitions." },
+  { q: "Which streaming output mode rewrites the full result on every trigger?", opts: ["Append","Update","Complete","Overwrite"], ans: 2, exp: "Complete mode writes the entire result table each trigger — required for global aggregations, but expensive for large datasets." },
+  { q: "What is the purpose of Window.partitionBy() in window functions?", opts: ["Repartitions the DataFrame","Defines groups for window calculations","Sorts the data globally","Caches the partition"], ans: 1, exp: "partitionBy() defines independent groups within which window functions (rank, lag, sum, etc.) are calculated." },
+  { q: "Which file format is typically fastest for analytical queries in Spark?", opts: ["CSV","JSON","Parquet","ORC"], ans: 2, exp: "Parquet is columnar, compressed, and supports predicate pushdown — ideal for analytics. ORC is also good but Parquet has wider ecosystem support." },
+  { q: "What does spark.sql.shuffle.partitions control?", opts: ["Number of executors","Default partitions after a shuffle (join, groupBy)","Input file splits","Cache partition count"], ans: 1, exp: "This config (default: 200) controls partition count after wide operations like joins and aggregations. Tune it based on data size." },
+];
+
+function initQuiz() {
+  quizScore = 0; quizIndex = 0; quizAnswered = false;
+  document.getElementById('quizGame').style.display = 'block';
+  document.getElementById('quizResults').style.display = 'none';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[quizIndex];
+  quizAnswered = false;
+  document.getElementById('qCounter').textContent = `Question ${quizIndex+1} of ${questions.length}`;
+  document.getElementById('qScoreDisplay').textContent = `Score: ${quizScore}`;
+  document.getElementById('qProgressFill').style.width = ((quizIndex / questions.length) * 100) + '%';
+  document.getElementById('quizQuestion').textContent = q.q;
+  document.getElementById('quizFeedback').className = 'quiz-feedback';
+  document.getElementById('quizFeedback').textContent = '';
+  document.getElementById('nextBtn').style.display = 'none';
+  const opts = document.getElementById('quizOptions');
+  opts.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.textContent = opt;
+    btn.onclick = () => answerQuestion(i);
+    opts.appendChild(btn);
+  });
+}
+
+function answerQuestion(i) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const q = questions[quizIndex];
+  const btns = document.querySelectorAll('.quiz-opt');
+  btns.forEach((b, idx) => {
+    b.classList.add('disabled');
+    if (idx === q.ans) b.classList.add('correct');
+    else if (idx === i) b.classList.add('wrong');
+  });
+  if (i === q.ans) quizScore++;
+  const fb = document.getElementById('quizFeedback');
+  fb.textContent = (i === q.ans ? '✓ Correct! ' : '✗ Not quite. ') + q.exp;
+  fb.className = 'quiz-feedback show ' + (i === q.ans ? 'correct' : 'wrong');
+  document.getElementById('nextBtn').style.display = 'inline-flex';
+  document.getElementById('qScoreDisplay').textContent = `Score: ${quizScore}`;
+}
+
+function nextQuestion() {
+  quizIndex++;
+  if (quizIndex >= questions.length) showResults();
+  else renderQuestion();
+}
+
+function showResults() {
+  document.getElementById('quizGame').style.display = 'none';
+  document.getElementById('quizResults').style.display = 'block';
+  const pct = Math.round((quizScore / questions.length) * 100);
+  document.getElementById('finalScore').textContent = `${quizScore} / ${questions.length}`;
+  const msgs = ['Keep practicing! Review the cheat sheet.','Good effort! A few more revisions needed.','Great work! Solid PySpark knowledge.','Excellent! You clearly know PySpark well.','Perfect score! You\'re a Spark expert! 🔥'];
+  document.getElementById('scoreMsg').textContent = msgs[Math.floor(pct / 25)];
+  document.getElementById('quizScore').textContent = `${quizScore}/${questions.length}`;
+  updateProgress();
+}
+
+function restartQuiz() { initQuiz(); }
+
+// Init
+updatePartitions(3);
+visited.add('overview');
+updateProgress();
+</script>
+</body>
+</html>
