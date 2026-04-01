@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PostgreSQL MCQ Quiz – 2YE Level</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2128;
+    --border: #30363d;
+    --accent: #00d4aa;
+    --accent2: #f78166;
+    --accent3: #d2a8ff;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --correct: #3fb950;
+    --wrong: #f85149;
+    --warning: #d29922;
+    --code-bg: #0d1117;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─────────────────────────────── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--accent), #0099ff);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    color: #000;
+  }
+
+  .logo h1 {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  .logo span { color: var(--accent); }
+
+  .header-stats {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .stat-pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+  }
+
+  .stat-pill strong { color: var(--accent); }
+
+  /* ─── HERO ────────────────────────────────── */
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+    padding: 60px 40px 40px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse, rgba(0,212,170,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,212,170,0.1);
+    border: 1px solid rgba(0,212,170,0.3);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+  }
+
+  .hero h2 {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+    line-height: 1.1;
+  }
+
+  .hero h2 span { color: var(--accent); }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 16px;
+    margin-bottom: 30px;
+  }
+
+  .topic-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+
+  .tag {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+  }
+
+  /* ─── PROGRESS BAR ────────────────────────── */
+  .progress-wrap {
+    max-width: 900px;
+    margin: 0 auto 10px;
+    padding: 0 40px;
+  }
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #0099ff);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* ─── QUIZ CONTAINER ──────────────────────── */
+  .quiz-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px 40px 80px;
+  }
+
+  /* ─── QUESTION CARD ───────────────────────── */
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+    transition: border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .question-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), #0099ff);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .question-card.answered::before { opacity: 1; }
+
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .q-number {
+    background: linear-gradient(135deg, var(--accent), #0099ff);
+    color: #000;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    border-radius: 8px;
+    padding: 4px 10px;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .q-category {
+    background: rgba(210,168,255,0.12);
+    color: var(--accent3);
+    border: 1px solid rgba(210,168,255,0.25);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    white-space: nowrap;
+    margin-top: 4px;
+  }
+
+  .q-text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text);
+    font-weight: 600;
+    flex: 1;
+  }
+
+  /* ─── CODE BLOCK ──────────────────────────── */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  .code-block .lang-tag {
+    position: absolute;
+    top: 8px; right: 12px;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .kw { color: #ff7b72; }
+  .fn { color: #d2a8ff; }
+  .str { color: #a5d6ff; }
+  .num { color: #79c0ff; }
+  .cm { color: #8b949e; font-style: italic; }
+  .op { color: #ff7b72; }
+  .tbl { color: #ffa657; }
+  .col { color: #e6edf3; }
+
+  /* ─── TABLE ───────────────────────────────── */
+  .data-table-wrap {
+    overflow-x: auto;
+    margin: 16px 0;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+
+  .data-table th {
+    background: var(--surface2);
+    color: var(--accent);
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .data-table td {
+    padding: 9px 16px;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+    color: var(--text);
+  }
+
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ─── OPTIONS ─────────────────────────────── */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .option-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--surface2);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .option-label:hover {
+    border-color: var(--accent);
+    background: rgba(0,212,170,0.05);
+  }
+
+  .option-label input[type="radio"] { display: none; }
+
+  .option-label.selected {
+    border-color: var(--accent);
+    background: rgba(0,212,170,0.08);
+  }
+
+  .option-dot {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .option-label.selected .option-dot {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  .option-label.selected .option-dot::after {
+    content: '';
+    width: 6px; height: 6px;
+    background: #000;
+    border-radius: 50%;
+  }
+
+  .option-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .option-text { flex: 1; }
+
+  code.inline {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent3);
+  }
+
+  /* ─── SUBMIT / RESULTS ────────────────────── */
+  .submit-zone {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(13,17,23,0.95);
+    border-top: 1px solid var(--border);
+    padding: 16px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(10px);
+    z-index: 99;
+  }
+
+  .submit-hint {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .submit-hint strong { color: var(--warning); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #0099ff);
+    color: #000;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(0,212,170,0.3);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #f85149, #da3633);
+    color: #fff;
+  }
+
+  /* ─── SCORE SCREEN ────────────────────────── */
+  #score-screen { display: none; padding: 40px; }
+
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 48px;
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .score-card::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: 50%;
+    transform: translateX(-50%);
+    width: 400px; height: 250px;
+    background: radial-gradient(ellipse, rgba(0,212,170,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .score-emoji { font-size: 64px; margin-bottom: 16px; }
+
+  .score-value {
+    font-size: 80px;
+    font-weight: 800;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--accent), #0099ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .score-label { font-size: 16px; color: var(--muted); margin: 8px 0 24px; }
+
+  .score-breakdown {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+
+  .score-stat {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 24px;
+    min-width: 110px;
+  }
+
+  .score-stat .val {
+    font-size: 28px;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .score-stat .lbl {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .val-correct { color: var(--correct); }
+  .val-wrong { color: var(--wrong); }
+  .val-skip { color: var(--warning); }
+
+  .score-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* ─── REVIEW SECTION ──────────────────────── */
+  .review-header {
+    max-width: 900px;
+    margin: 0 auto 20px;
+    font-size: 22px;
+    font-weight: 800;
+    padding: 0 40px;
+  }
+
+  .review-header span { color: var(--accent); }
+
+  .review-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 16px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 16px;
+  }
+
+  .review-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    border-radius: 6px;
+    padding: 3px 10px;
+    margin-bottom: 12px;
+  }
+
+  .status-correct { background: rgba(63,185,80,0.12); color: var(--correct); border: 1px solid rgba(63,185,80,0.3); }
+  .status-wrong { background: rgba(248,81,73,0.12); color: var(--wrong); border: 1px solid rgba(248,81,73,0.3); }
+  .status-skip { background: rgba(210,153,34,0.12); color: var(--warning); border: 1px solid rgba(210,153,34,0.3); }
+
+  .review-q { font-size: 15px; font-weight: 600; margin-bottom: 12px; line-height: 1.5; }
+
+  .review-options { display: flex; flex-direction: column; gap: 6px; }
+
+  .review-opt {
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    border: 1px solid transparent;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+
+  .review-opt.r-correct { background: rgba(63,185,80,0.08); border-color: rgba(63,185,80,0.3); color: var(--correct); }
+  .review-opt.r-wrong { background: rgba(248,81,73,0.08); border-color: rgba(248,81,73,0.3); color: var(--wrong); }
+  .review-opt.r-neutral { color: var(--muted); }
+
+  .explanation {
+    margin-top: 14px;
+    padding: 12px 16px;
+    background: rgba(210,168,255,0.06);
+    border-left: 3px solid var(--accent3);
+    border-radius: 0 8px 8px 0;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .explanation strong { color: var(--text); }
+
+  @media (max-width: 600px) {
+    header { padding: 16px 20px; }
+    .hero { padding: 40px 20px 30px; }
+    .quiz-container { padding: 20px 20px 80px; }
+    .submit-zone { padding: 14px 20px; }
+    .score-card { padding: 32px 20px; }
+    .review-header { padding: 0 20px; }
+    .review-card { margin: 0 20px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">PG</div>
+    <h1>Postgres<span>Quiz</span></h1>
+  </div>
+  <div class="header-stats">
+    <div class="stat-pill">Questions: <strong id="hdr-total">50</strong></div>
+    <div class="stat-pill">Answered: <strong id="hdr-answered">0</strong></div>
+  </div>
+</header>
+
+<!-- QUIZ SCREEN -->
+<div id="quiz-screen">
+  <div class="hero">
+    <div class="hero-badge">▸ 2 Years Experience Level</div>
+    <h2>PostgreSQL <span>Scenario MCQ</span></h2>
+    <p>50 real-world questions: query output, CTEs, window functions, EXPLAIN, transactions & more</p>
+    <div class="topic-tags">
+      <span class="tag">Query Output</span>
+      <span class="tag">Window Functions</span>
+      <span class="tag">CTEs</span>
+      <span class="tag">Indexes</span>
+      <span class="tag">Transactions</span>
+      <span class="tag">EXPLAIN</span>
+      <span class="tag">Joins</span>
+      <span class="tag">Aggregates</span>
+      <span class="tag">JSON</span>
+      <span class="tag">Locking</span>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-info">
+      <span>Progress</span>
+      <span id="prog-text">0 / 50</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+
+  <div class="quiz-container" id="questions-container"></div>
+
+  <div class="submit-zone">
+    <div class="submit-hint">Answered: <strong id="sz-answered">0</strong> / 50 — Unanswered questions will be marked as skipped.</div>
+    <button class="btn btn-primary" id="submit-btn" onclick="submitQuiz()">Submit Quiz →</button>
+  </div>
+</div>
+
+<!-- SCORE SCREEN -->
+<div id="score-screen">
+  <div class="score-card">
+    <div class="score-emoji" id="score-emoji">🎯</div>
+    <div class="score-value" id="score-pct">0%</div>
+    <div class="score-label">Your Score</div>
+    <div class="score-breakdown">
+      <div class="score-stat"><div class="val val-correct" id="sc-correct">0</div><div class="lbl">Correct</div></div>
+      <div class="score-stat"><div class="val val-wrong" id="sc-wrong">0</div><div class="lbl">Wrong</div></div>
+      <div class="score-stat"><div class="val val-skip" id="sc-skip">0</div><div class="lbl">Skipped</div></div>
+      <div class="score-stat"><div class="val" id="sc-time">--</div><div class="lbl">Time Taken</div></div>
+    </div>
+    <div class="score-actions">
+      <button class="btn btn-primary" onclick="generatePDF()">⬇ Download PDF Report</button>
+      <button class="btn btn-outline" onclick="retakeQuiz()">↺ Retake Quiz</button>
+    </div>
+  </div>
+  <div class="review-header">Answer <span>Review</span></div>
+  <div id="review-container" style="padding:0 40px 80px;max-width:980px;margin:0 auto;"></div>
+</div>
+
+<script>
+const questions = [
+  // ───────────────────── QUERY OUTPUT ─────────────────────
+  {
+    cat: "Query Output",
+    q: `Given the table <strong>employees</strong> below, what does this query return?
+<div class='data-table-wrap'><table class='data-table'><thead><tr><th>id</th><th>name</th><th>dept</th><th>salary</th></tr></thead><tbody>
+<tr><td>1</td><td>Alice</td><td>HR</td><td>5000</td></tr>
+<tr><td>2</td><td>Bob</td><td>IT</td><td>7000</td></tr>
+<tr><td>3</td><td>Carol</td><td>HR</td><td>6000</td></tr>
+<tr><td>4</td><td>Dave</td><td>IT</td><td>8000</td></tr>
+</tbody></table></div>
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>SELECT</span> dept, <span class='fn'>MAX</span>(salary) <span class='kw'>FROM</span> <span class='tbl'>employees</span>
+<span class='kw'>GROUP BY</span> dept
+<span class='kw'>HAVING</span> <span class='fn'>MAX</span>(salary) > <span class='num'>7000</span>;
+</div>`,
+    opts: ["HR, 6000", "IT, 8000", "IT, 8000 only (one row)", "HR, 6000 and IT, 8000 (two rows)"],
+    ans: 2,
+    exp: "Only the IT department has MAX(salary) = 8000 which is > 7000. HR's MAX is 6000, which does not satisfy HAVING. So only one row is returned: IT | 8000."
+  },
+  {
+    cat: "Query Output",
+    q: `What is the output of the following query?
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>SELECT</span> <span class='fn'>COALESCE</span>(<span class='kw'>NULL</span>, <span class='kw'>NULL</span>, <span class='str'>'pg'</span>, <span class='str'>'sql'</span>);
+</div>`,
+    opts: ["NULL", "pg", "sql", "pgsql"],
+    ans: 1,
+    exp: "COALESCE returns the first non-NULL value. It evaluates left to right: NULL → NULL → 'pg' (non-null). So the result is 'pg'."
+  },
+  {
+    cat: "Query Output",
+    q: `Given <code class='inline'>orders(order_id, customer_id, amount)</code>, what does this return?
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>SELECT</span> customer_id, <span class='fn'>COUNT</span>(*), <span class='fn'>SUM</span>(amount)
+<span class='kw'>FROM</span> <span class='tbl'>orders</span>
+<span class='kw'>GROUP BY</span> customer_id
+<span class='kw'>ORDER BY</span> <span class='fn'>SUM</span>(amount) <span class='kw'>DESC</span>
+<span class='kw'>LIMIT</span> <span class='num'>1</span>;
+</div>`,
+    opts: ["Customer with most orders", "Customer with highest total amount spent", "Customer with lowest amount", "Random customer"],
+    ans: 1,
+    exp: "ORDER BY SUM(amount) DESC puts the highest spender first. LIMIT 1 returns only that top row — the customer who spent the most in total."
+  },
+  {
+    cat: "Query Output",
+    q: `What does this query return if table <strong>t</strong> has rows: (1), (2), (NULL)?
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>SELECT</span> <span class='fn'>COUNT</span>(*), <span class='fn'>COUNT</span>(val) <span class='kw'>FROM</span> <span class='tbl'>t</span>;
+</div>`,
+    opts: ["3, 3", "3, 2", "2, 2", "3, NULL"],
+    ans: 1,
+    exp: "COUNT(*) counts all rows including NULLs → 3. COUNT(val) counts only non-NULL values → 2. Result is 3 | 2."
+  },
+  {
+    cat: "Query Output",
+    q: `What is the result of:
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>SELECT</span> <span class='num'>10</span> / <span class='num'>3</span>, <span class='num'>10</span>.<span class='num'>0</span> / <span class='num'>3</span>;
+</div>`,
+    opts: ["3, 3.33", "3, 3.3333...", "3.33, 3.33", "Error"],
+    ans: 1,
+    exp: "10 / 3 is integer division in PostgreSQL → 3. 10.0 / 3 promotes to numeric → 3.3333333... (repeating). Both values are shown."
+  },
+  // ─────────────── WINDOW FUNCTIONS ───────────────────────
+  {
+    cat: "Window Functions",
+    q: `Given <strong>sales(rep, month, revenue)</strong>, which query correctly gives each rep's revenue as a % of their own total?
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>SELECT</span> rep, month, revenue,
+  <span class='fn'>ROUND</span>(revenue * <span class='num'>100.0</span> / <span class='fn'>SUM</span>(revenue) <span class='kw'>OVER</span> (<span class='kw'>PARTITION BY</span> rep), <span class='num'>2</span>) AS pct
+<span class='kw'>FROM</span> <span class='tbl'>sales</span>;
+</div>`,
+    opts: ["% of each month's revenue vs grand total", "% of each row vs the rep's total revenue", "% of each rep vs all reps", "Syntax error — window needs ORDER BY"],
+    ans: 1,
+    exp: "SUM(revenue) OVER (PARTITION BY rep) computes each rep's total separately. Dividing each row's revenue by that gives the percentage share within the rep's own rows. No ORDER BY is needed for non-cumulative window aggregates."
+  },
+  {
+    cat: "Window Functions",
+    q: `What does <code class='inline'>ROW_NUMBER()</code> vs <code class='inline'>RANK()</code> return when two rows have the same value?`,
+    opts: [
+      "Both return the same number for ties",
+      "ROW_NUMBER gives unique sequential numbers; RANK gives the same rank to ties and skips the next",
+      "RANK gives unique numbers; ROW_NUMBER skips duplicates",
+      "They are identical in PostgreSQL"
+    ],
+    ans: 1,
+    exp: "ROW_NUMBER always assigns unique sequential integers regardless of ties. RANK assigns the same number to tied rows but then skips rank numbers. DENSE_RANK also assigns the same rank to ties but doesn't skip."
+  },
+  {
+    cat: "Window Functions",
+    q: `What does the following query compute?
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>SELECT</span> id, amount,
+  <span class='fn'>SUM</span>(amount) <span class='kw'>OVER</span> (<span class='kw'>ORDER BY</span> id <span class='kw'>ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</span>)
+<span class='kw'>FROM</span> <span class='tbl'>orders</span>;
+</div>`,
+    opts: ["Total sum of all amounts", "Running cumulative sum up to and including the current row", "Average amount", "Sum excluding current row"],
+    ans: 1,
+    exp: "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW defines a window frame from the very first row to the current row — this produces a running/cumulative sum."
+  },
+  {
+    cat: "Window Functions",
+    q: `Which function would you use to get the value from the <em>previous row</em> in a time series?`,
+    opts: ["FIRST_VALUE()", "LAG(col, 1)", "LEAD(col, 1)", "PREV()"],
+    ans: 1,
+    exp: "LAG(col, 1) retrieves the value from 1 row before the current row within the window partition. LEAD(col, 1) does the opposite — it retrieves the next row's value."
+  },
+  {
+    cat: "Window Functions",
+    q: `What is the output of NTILE(4) for a partition with 10 rows?`,
+    opts: [
+      "All rows get value 4",
+      "Rows are split into 4 groups: 3 rows, 3 rows, 2 rows, 2 rows",
+      "Rows are split into 4 groups: 3 rows, 3 rows, 2 rows, 2 rows — but ordering matters",
+      "Error: 10 not divisible by 4"
+    ],
+    ans: 2,
+    exp: "NTILE(4) divides the ordered partition into 4 as-equal-as-possible buckets. 10 ÷ 4 = 2 remainder 2, so the first 2 buckets get 3 rows and the last 2 get 2 rows. ORDER BY inside the OVER clause is required."
+  },
+  // ─────────────── CTEs & SUBQUERIES ─────────────────────
+  {
+    cat: "CTEs",
+    q: `What is the key difference between a CTE and a subquery in PostgreSQL?`,
+    opts: [
+      "CTEs are always faster than subqueries",
+      "CTEs are named, reusable within the same query, and can be recursive; subqueries are inline and not reusable",
+      "Subqueries can be recursive, CTEs cannot",
+      "CTEs require a separate transaction"
+    ],
+    ans: 1,
+    exp: "CTEs (WITH clauses) are named result sets valid for the duration of the statement. They can be referenced multiple times, making them more readable. Crucially, WITH RECURSIVE enables recursive queries. Subqueries are inline and can only be used once."
+  },
+  {
+    cat: "CTEs",
+    q: `What does this recursive CTE produce?
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>WITH RECURSIVE</span> cnt(n) <span class='kw'>AS</span> (
+  <span class='kw'>SELECT</span> <span class='num'>1</span>
+  <span class='kw'>UNION ALL</span>
+  <span class='kw'>SELECT</span> n + <span class='num'>1</span> <span class='kw'>FROM</span> cnt <span class='kw'>WHERE</span> n &lt; <span class='num'>5</span>
+)
+<span class='kw'>SELECT</span> * <span class='kw'>FROM</span> cnt;
+</div>`,
+    opts: ["1 row: 5", "5 rows: 1, 2, 3, 4, 5", "Infinite loop", "6 rows: 0, 1, 2, 3, 4, 5"],
+    ans: 1,
+    exp: "The base case is 1. Each recursive step adds 1 while n < 5, producing 2, 3, 4, 5. The WHERE condition stops the recursion at n=5. Result: 5 rows with values 1 through 5."
+  },
+  {
+    cat: "CTEs",
+    q: `In PostgreSQL 12+, what happens when you use a CTE with <code class='inline'>WITH ... AS MATERIALIZED</code>?`,
+    opts: [
+      "The CTE is always re-evaluated each time it is referenced",
+      "The CTE result is computed once and stored; subsequent references use the cached result",
+      "The CTE is converted to a temporary table automatically",
+      "This syntax is invalid in PostgreSQL"
+    ],
+    ans: 1,
+    exp: "AS MATERIALIZED forces PostgreSQL to evaluate the CTE once and cache the result. Without it (or with AS NOT MATERIALIZED), the planner may inline the CTE if it thinks that's cheaper. Materialization adds a fence that prevents certain optimizations."
+  },
+  // ─────────────── JOINS ──────────────────────────────────
+  {
+    cat: "Joins",
+    q: `Given these tables, what does a LEFT JOIN return?
+<div class='data-table-wrap'><table class='data-table'><thead><tr><th>customers.id</th><th>customers.name</th></tr></thead><tbody>
+<tr><td>1</td><td>Alice</td></tr><tr><td>2</td><td>Bob</td></tr><tr><td>3</td><td>Carol</td></tr>
+</tbody></table></div>
+<div class='data-table-wrap'><table class='data-table'><thead><tr><th>orders.id</th><th>orders.cust_id</th></tr></thead><tbody>
+<tr><td>10</td><td>1</td></tr><tr><td>11</td><td>1</td></tr>
+</tbody></table></div>
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>SELECT</span> c.name, o.id <span class='kw'>FROM</span> <span class='tbl'>customers</span> c
+<span class='kw'>LEFT JOIN</span> <span class='tbl'>orders</span> o <span class='kw'>ON</span> c.id = o.cust_id;
+</div>`,
+    opts: [
+      "2 rows: Alice/10, Alice/11",
+      "3 rows: Alice/10, Alice/11, Bob/NULL",
+      "4 rows: Alice/10, Alice/11, Bob/NULL, Carol/NULL",
+      "3 rows: Alice/10, Alice/11, Carol/NULL"
+    ],
+    ans: 2,
+    exp: "LEFT JOIN returns all rows from the left table (customers) plus matching rows from orders. Alice has 2 orders, Bob has none (NULL), Carol has none (NULL). So 4 rows total."
+  },
+  {
+    cat: "Joins",
+    q: `What is the difference between <code class='inline'>INNER JOIN</code> and <code class='inline'>CROSS JOIN</code>?`,
+    opts: [
+      "INNER JOIN filters rows by a condition; CROSS JOIN produces a Cartesian product of all row combinations",
+      "CROSS JOIN is the same as LEFT JOIN",
+      "INNER JOIN is faster, CROSS JOIN is just an alias",
+      "CROSS JOIN requires a ON condition"
+    ],
+    ans: 0,
+    exp: "INNER JOIN only returns rows where the join condition is TRUE. CROSS JOIN returns every combination of rows from both tables (N × M rows). CROSS JOIN has no ON clause."
+  },
+  {
+    cat: "Joins",
+    q: `What does a <code class='inline'>FULL OUTER JOIN</code> guarantee?`,
+    opts: [
+      "All rows from the left table only",
+      "Only rows that match in both tables",
+      "All rows from both tables, with NULLs where there is no match on either side",
+      "Duplicate rows are removed"
+    ],
+    ans: 2,
+    exp: "FULL OUTER JOIN = LEFT JOIN ∪ RIGHT JOIN. It returns all rows from both tables. Where no match exists on the left, right-side columns are NULL, and vice versa."
+  },
+  // ─────────────── INDEXES ─────────────────────────────────
+  {
+    cat: "Indexes",
+    q: `Which index type is best suited for a column that stores text values and needs <code class='inline'>ILIKE '%keyword%'</code> searches?`,
+    opts: ["B-Tree index", "Hash index", "GIN index with pg_trgm extension", "BRIN index"],
+    ans: 2,
+    exp: "A B-Tree index cannot handle leading-wildcard ILIKE searches. The pg_trgm extension creates trigram-based GIN (or GiST) indexes that support efficient ILIKE '%pattern%' queries."
+  },
+  {
+    cat: "Indexes",
+    q: `When would a <strong>partial index</strong> be more efficient than a full index?`,
+    opts: [
+      "Always — partial indexes are always faster",
+      "When queries consistently filter on a specific condition, indexing only those rows reduces size and improves selectivity",
+      "When the table has no primary key",
+      "Partial indexes are not supported in PostgreSQL"
+    ],
+    ans: 1,
+    exp: "A partial index includes only rows satisfying a WHERE clause (e.g. CREATE INDEX ON orders(status) WHERE status = 'pending'). This is smaller and faster when your queries always filter on that condition."
+  },
+  {
+    cat: "Indexes",
+    q: `A table has a composite index on <code class='inline'>(a, b, c)</code>. Which WHERE clause can use this index?`,
+    opts: [
+      "WHERE b = 1 AND c = 2 (skipping a)",
+      "WHERE a = 1 AND c = 2 (skipping b — partial prefix use)",
+      "WHERE a = 1 AND b = 2 (using the leading prefix)",
+      "Only WHERE a = 1 AND b = 2 AND c = 3 (full index use)"
+    ],
+    ans: 2,
+    exp: "PostgreSQL's B-Tree composite index supports queries using a leading prefix of the index columns. WHERE a = 1 AND b = 2 uses the (a, b) prefix. Skipping the leading column (e.g. starting from b) prevents B-Tree index usage for that condition."
+  },
+  {
+    cat: "Indexes",
+    q: `What is a <strong>BRIN index</strong> best suited for?`,
+    opts: [
+      "Text search on small tables",
+      "Columns with high cardinality and random distribution",
+      "Very large tables where data is physically ordered (e.g. timestamp-based append-only tables)",
+      "JSONB columns"
+    ],
+    ans: 2,
+    exp: "BRIN (Block Range Index) stores min/max values per block range. It works best on large tables where column values are correlated with physical storage order — like auto-incrementing IDs or timestamps in append-only tables. Very small and fast to create."
+  },
+  // ─────────────── TRANSACTIONS & LOCKING ──────────────────
+  {
+    cat: "Transactions",
+    q: `What happens if you run <code class='inline'>ROLLBACK</code> inside a PostgreSQL transaction that already hit an error?`,
+    opts: [
+      "The transaction continues from before the error",
+      "The entire transaction is rolled back to its start",
+      "Only the last statement is rolled back",
+      "Nothing — ROLLBACK is a no-op after an error"
+    ],
+    ans: 1,
+    exp: "In PostgreSQL, any error in a transaction puts it into an 'aborted' state. The only valid command at that point is ROLLBACK (or ROLLBACK TO SAVEPOINT). ROLLBACK undoes the entire transaction."
+  },
+  {
+    cat: "Transactions",
+    q: `Which isolation level prevents <em>phantom reads</em>?`,
+    opts: [
+      "READ UNCOMMITTED",
+      "READ COMMITTED (PostgreSQL default)",
+      "REPEATABLE READ",
+      "SERIALIZABLE"
+    ],
+    ans: 3,
+    exp: "Phantom reads occur when a transaction re-runs a query and sees new rows inserted by another committed transaction. SERIALIZABLE (and to some extent PostgreSQL's REPEATABLE READ via SSI) prevents this. READ COMMITTED is PostgreSQL's default and allows phantom reads."
+  },
+  {
+    cat: "Transactions",
+    q: `What does <code class='inline'>SELECT ... FOR UPDATE</code> do?`,
+    opts: [
+      "Locks the table for DDL changes",
+      "Marks the selected rows with exclusive locks, preventing other transactions from modifying or locking them until commit",
+      "Immediately updates the rows",
+      "Creates a snapshot of the rows"
+    ],
+    ans: 1,
+    exp: "SELECT ... FOR UPDATE acquires row-level exclusive locks on selected rows. Other transactions that try to SELECT ... FOR UPDATE or UPDATE those rows will block until the first transaction commits or rolls back."
+  },
+  {
+    cat: "Transactions",
+    q: `What is a <strong>SAVEPOINT</strong> in PostgreSQL?`,
+    opts: [
+      "A backup of the entire database",
+      "A named point within a transaction to which you can partially roll back without aborting the whole transaction",
+      "A checkpoint for WAL flushing",
+      "An auto-commit trigger"
+    ],
+    ans: 1,
+    exp: "SAVEPOINT name creates a rollback point inside a transaction. ROLLBACK TO SAVEPOINT name undoes work after the savepoint without aborting the full transaction. This allows partial error recovery within a transaction block."
+  },
+  // ─────────────── EXPLAIN / QUERY PLANNING ────────────────
+  {
+    cat: "EXPLAIN / Planning",
+    q: `In an <code class='inline'>EXPLAIN ANALYZE</code> output, what does the term <strong>Seq Scan</strong> mean?`,
+    opts: [
+      "The query used an index to find rows",
+      "PostgreSQL read every row in the table sequentially (full table scan)",
+      "The query used a sequential join algorithm",
+      "Rows were sorted in sequence"
+    ],
+    ans: 1,
+    exp: "Seq Scan means PostgreSQL read all blocks of the table from start to end — a full table scan. This happens when no suitable index exists or when the planner estimates it's cheaper than an index scan (e.g. for large portions of the table)."
+  },
+  {
+    cat: "EXPLAIN / Planning",
+    q: `What is the difference between <code class='inline'>EXPLAIN</code> and <code class='inline'>EXPLAIN ANALYZE</code>?`,
+    opts: [
+      "They are identical",
+      "EXPLAIN shows estimated costs; EXPLAIN ANALYZE actually executes the query and shows real timing and row counts",
+      "EXPLAIN ANALYZE only works on SELECT statements",
+      "EXPLAIN always uses cached plans, ANALYZE refreshes statistics"
+    ],
+    ans: 1,
+    exp: "EXPLAIN shows the query plan with estimated costs and row counts based on statistics — the query is NOT executed. EXPLAIN ANALYZE actually runs the query and shows real execution times and actual rows, which can differ significantly from estimates."
+  },
+  {
+    cat: "EXPLAIN / Planning",
+    q: `When would the planner choose a <strong>Hash Join</strong> over a <strong>Nested Loop Join</strong>?`,
+    opts: [
+      "Hash Join is always chosen for small tables",
+      "Hash Join is preferred for large tables where building a hash table is cheaper than repeated probing; Nested Loop suits small inner sets or indexed lookups",
+      "Nested Loop is always faster",
+      "Hash Join only works with equality conditions"
+    ],
+    ans: 1,
+    exp: "Nested Loop works well when the inner side is small or has a fast index. Hash Join builds a hash table of the smaller relation and probes it for each row of the outer, making it efficient for large equi-joins without useful indexes. Hash Join requires more memory (work_mem)."
+  },
+  // ─────────────── AGGREGATES & GROUPING ───────────────────
+  {
+    cat: "Aggregates",
+    q: `What does <code class='inline'>FILTER (WHERE ...)</code> do in an aggregate?
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>SELECT</span>
+  <span class='fn'>COUNT</span>(*) <span class='kw'>FILTER</span> (<span class='kw'>WHERE</span> status = <span class='str'>'active'</span>) AS active_cnt,
+  <span class='fn'>COUNT</span>(*) AS total_cnt
+<span class='kw'>FROM</span> <span class='tbl'>users</span>;
+</div>`,
+    opts: [
+      "Filters rows before they reach the query",
+      "Counts only rows matching the condition for that aggregate; total_cnt still counts all rows",
+      "This is equivalent to adding WHERE to the query",
+      "Syntax error in PostgreSQL"
+    ],
+    ans: 1,
+    exp: "FILTER (WHERE ...) is an aggregate modifier. active_cnt counts only rows where status='active', while total_cnt counts all rows. Multiple aggregates with different FILTER conditions can appear in one query — equivalent to conditional COUNTs."
+  },
+  {
+    cat: "Aggregates",
+    q: `What does <code class='inline'>GROUPING SETS</code> do?
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>SELECT</span> dept, year, <span class='fn'>SUM</span>(salary)
+<span class='kw'>FROM</span> <span class='tbl'>employees</span>
+<span class='kw'>GROUP BY</span> <span class='kw'>GROUPING SETS</span> ((dept, year), (dept), ());
+</div>`,
+    opts: [
+      "Groups by dept and year only",
+      "Produces multiple result sets in one query: subtotals by (dept,year), by dept, and a grand total",
+      "Requires a UNION ALL to work",
+      "This is invalid SQL — use ROLLUP instead"
+    ],
+    ans: 1,
+    exp: "GROUPING SETS computes aggregates for each specified grouping in a single pass. This query returns per-department-per-year rows, per-department subtotals (all years combined), and a grand total row — equivalent to three UNION ALL queries."
+  },
+  {
+    cat: "Aggregates",
+    q: `What is the difference between <code class='inline'>ROLLUP</code> and <code class='inline'>CUBE</code>?`,
+    opts: [
+      "They are identical",
+      "ROLLUP generates a hierarchy of subtotals (left to right); CUBE generates all possible combinations",
+      "CUBE is faster than ROLLUP",
+      "ROLLUP requires a time column; CUBE does not"
+    ],
+    ans: 1,
+    exp: "ROLLUP(a, b, c) generates groupings: (a,b,c), (a,b), (a), (). It's a hierarchical rollup. CUBE(a, b, c) generates all 2^n combinations: (a,b,c), (a,b), (a,c), (b,c), (a), (b), (c), (). CUBE is more comprehensive but more expensive."
+  },
+  // ─────────────── JSONB & ARRAYS ──────────────────────────
+  {
+    cat: "JSONB / Arrays",
+    q: `Given a column <code class='inline'>data JSONB</code> with value <code class='inline'>{"user": {"id": 42, "name": "Raj"}}</code>, which expression extracts the name as text?`,
+    opts: [
+      `<code class='inline'>data->'user'->>'name'</code>`,
+      `<code class='inline'>data->'user'->'name'</code>`,
+      `<code class='inline'>data->>'user.name'</code>`,
+      `<code class='inline'>data#>>'user.name'</code>`
+    ],
+    ans: 0,
+    exp: "-> extracts a JSONB element (keeping it as JSONB). ->> extracts as text. So data->'user' gets the nested object, then ->>'name' extracts the name as text. data#>>'{user,name}' is the path-based alternative."
+  },
+  {
+    cat: "JSONB / Arrays",
+    q: `How do you check if a JSONB column contains a specific key?
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>SELECT</span> * <span class='kw'>FROM</span> <span class='tbl'>products</span> <span class='kw'>WHERE</span> attributes <span class='op'>??</span> <span class='str'>'color'</span>;
+</div>`,
+    opts: [
+      "This is invalid — use JSON_EXISTS()",
+      "The ?? operator checks if 'color' is a top-level key in the JSONB column",
+      "This searches for the value 'color' anywhere in the JSON",
+      "?? is a NULL-safe comparison operator"
+    ],
+    ans: 1,
+    exp: "The ? operator (shown as ?? in some clients to avoid parameter interpolation) checks whether the string is a top-level key in the JSONB value. This is efficiently supported by GIN indexes on JSONB columns."
+  },
+  {
+    cat: "JSONB / Arrays",
+    q: `What does the <code class='inline">@></code> operator do with JSONB?`,
+    opts: [
+      "Checks if left JSONB contains the right JSONB (containment check)",
+      "Concatenates two JSONB objects",
+      "Compares JSONB by size",
+      "Removes keys from JSONB"
+    ],
+    ans: 0,
+    exp: "@> is the 'contains' operator. For example, '{'a':1, 'b':2}'::jsonb @> '{'a':1}'::jsonb returns TRUE. It checks if all key-value pairs in the right operand exist in the left. GIN indexes support this operation efficiently."
+  },
+  // ─────────────── PERFORMANCE & VACUUMING ─────────────────
+  {
+    cat: "Performance",
+    q: `What is <strong>table bloat</strong> in PostgreSQL and how is it addressed?`,
+    opts: [
+      "Too many columns in a table; fixed by normalization",
+      "Dead tuples (old row versions from MVCC) accumulating on disk; addressed by VACUUM",
+      "Indexes growing too large; fixed by REINDEX",
+      "Too many connections; fixed by pg_bouncer"
+    ],
+    ans: 1,
+    exp: "PostgreSQL's MVCC model keeps old row versions (dead tuples) instead of overwriting them. Over time these dead tuples cause bloat. VACUUM reclaims space by marking dead tuples as reusable. VACUUM FULL rewrites the entire table but requires an exclusive lock."
+  },
+  {
+    cat: "Performance",
+    q: `When should you run <code class='inline'>ANALYZE</code> on a table?`,
+    opts: [
+      "Never — PostgreSQL handles it automatically forever",
+      "After large bulk inserts/updates so the planner has fresh statistics for cost estimation",
+      "Only before VACUUM",
+      "Only on indexed columns"
+    ],
+    ans: 1,
+    exp: "ANALYZE updates table statistics used by the query planner. After bulk data changes the statistics may be stale, causing the planner to choose poor query plans. Auto-analyze handles this in most cases, but manual ANALYZE is warranted after large ETL loads."
+  },
+  {
+    cat: "Performance",
+    q: `What does <code class='inline'>work_mem</code> control in PostgreSQL?`,
+    opts: [
+      "Total memory for the server",
+      "Memory allocated per sort/hash operation per query; more work_mem reduces disk spills",
+      "Memory for shared buffers",
+      "Maximum connection count"
+    ],
+    ans: 1,
+    exp: "work_mem controls the amount of memory for each sort or hash operation within a query. If a sort exceeds this, PostgreSQL spills to disk (a temp file). Setting it higher can speed up queries with sorts/hash joins, but it multiplies across all operations and connections."
+  },
+  // ─────────────── CONSTRAINTS & DDL ───────────────────────
+  {
+    cat: "Constraints / DDL",
+    q: `What is the effect of <code class='inline'>ON DELETE CASCADE</code> on a foreign key?`,
+    opts: [
+      "Prevents deletion of parent rows if child rows exist",
+      "Automatically deletes child rows when the referenced parent row is deleted",
+      "Sets the foreign key to NULL when the parent is deleted",
+      "Raises an error if the child row has no parent"
+    ],
+    ans: 1,
+    exp: "ON DELETE CASCADE means: when a referenced parent row is deleted, all child rows that reference it are automatically deleted too. Other options include ON DELETE SET NULL, ON DELETE RESTRICT (blocks deletion if children exist), and ON DELETE NO ACTION (default)."
+  },
+  {
+    cat: "Constraints / DDL",
+    q: `What does <code class='inline'>ADD COLUMN ... NOT NULL DEFAULT ...</code> do in PostgreSQL 11+?`,
+    opts: [
+      "Rewrites the entire table — always slow",
+      "In PostgreSQL 11+, adding a NOT NULL column with a constant default no longer rewrites the table; the default is stored in catalog metadata",
+      "Creates a new table and migrates data",
+      "Requires a maintenance window"
+    ],
+    ans: 1,
+    exp: "Before PG11, adding a NOT NULL column with a DEFAULT required rewriting every row. From PG11 onward, if the default is a constant, PostgreSQL stores it in the catalog and returns it for old rows without rewriting the table. This makes the operation near-instant."
+  },
+  {
+    cat: "Constraints / DDL",
+    q: `What does <code class='inline'>CREATE INDEX CONCURRENTLY</code> do differently?`,
+    opts: [
+      "Builds the index in a single transaction with maximum locking",
+      "Builds the index without holding a full table lock, allowing reads and writes during index creation (slower but non-blocking)",
+      "Creates a partial index automatically",
+      "Requires superuser privileges"
+    ],
+    ans: 1,
+    exp: "CREATE INDEX CONCURRENTLY performs multiple passes over the table without holding an exclusive lock, so reads and DML can continue. It takes longer than regular CREATE INDEX and cannot be run inside a transaction block, but avoids downtime on busy tables."
+  },
+  // ─────────────── SCENARIO: OUTPUT PREDICTION ─────────────
+  {
+    cat: "Query Output",
+    q: `What is the result of this query?
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>SELECT</span> <span class='fn'>NULLIF</span>(<span class='num'>5</span>, <span class='num'>5</span>), <span class='fn'>NULLIF</span>(<span class='num'>5</span>, <span class='num'>6</span>);
+</div>`,
+    opts: ["NULL, NULL", "NULL, 5", "5, NULL", "5, 5"],
+    ans: 1,
+    exp: "NULLIF(a, b) returns NULL if a = b, otherwise returns a. NULLIF(5,5) → NULL. NULLIF(5,6) → 5 (they are not equal). Result: NULL | 5."
+  },
+  {
+    cat: "Query Output",
+    q: `What does this return if <strong>employees</strong> has 0 rows?
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>SELECT</span> <span class='fn'>AVG</span>(salary), <span class='fn'>MAX</span>(salary), <span class='fn'>COUNT</span>(*) <span class='kw'>FROM</span> <span class='tbl'>employees</span>;
+</div>`,
+    opts: ["No rows returned", "NULL, NULL, 0 — one row with NULL aggregates and count 0", "0, 0, 0", "Error"],
+    ans: 1,
+    exp: "Aggregate queries without GROUP BY always return exactly one row, even for empty tables. AVG and MAX return NULL for empty input; COUNT(*) returns 0. So you get one row: NULL | NULL | 0."
+  },
+  {
+    cat: "Query Output",
+    q: `Given <code class='inline'>val = NULL</code>, what does <code class='inline'>val = NULL</code> evaluate to?`,
+    opts: ["TRUE", "FALSE", "NULL", "Error"],
+    ans: 2,
+    exp: "In SQL, NULL compared with = always returns NULL (unknown), not TRUE or FALSE. To check for NULL use IS NULL or IS NOT NULL."
+  },
+  {
+    cat: "Query Output",
+    q: `What does <code class='inline'>DISTINCT ON</code> do?
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>SELECT DISTINCT ON</span> (dept) dept, name, salary
+<span class='kw'>FROM</span> <span class='tbl'>employees</span>
+<span class='kw'>ORDER BY</span> dept, salary <span class='kw'>DESC</span>;
+</div>`,
+    opts: [
+      "Returns all unique dept values only",
+      "Returns one row per department — the one with the highest salary (first after ORDER BY)",
+      "Groups by dept and returns AVG salary",
+      "Returns an error — DISTINCT ON requires LIMIT"
+    ],
+    ans: 1,
+    exp: "DISTINCT ON (dept) keeps only the first row for each unique dept value after applying ORDER BY. Since we order by dept then salary DESC, the first row per dept is the highest earner. This is a PostgreSQL-specific extension."
+  },
+  {
+    cat: "Query Output",
+    q: `What does <code class='inline'>EXCEPT</code> do vs <code class='inline'>EXCEPT ALL</code>?`,
+    opts: [
+      "EXCEPT removes duplicates from the difference; EXCEPT ALL keeps all occurrences including duplicates",
+      "They are identical",
+      "EXCEPT ALL is faster for large datasets",
+      "EXCEPT ALL includes rows from the second query that aren't in the first"
+    ],
+    ans: 0,
+    exp: "EXCEPT returns distinct rows in the first query that are not in the second. EXCEPT ALL is the multi-set version: for each occurrence in the first query, it removes one matching occurrence from the second, preserving duplicates."
+  },
+  // ─────────────── SCENARIO: REAL-WORLD PROBLEMS ───────────
+  {
+    cat: "Scenario",
+    q: `You have a query that was fast yesterday but is now doing Seq Scan instead of Index Scan. What is the most likely cause and fix?`,
+    opts: [
+      "The index was automatically dropped; run CREATE INDEX again",
+      "Table statistics are stale after large data changes; run ANALYZE to update them",
+      "PostgreSQL cache was flushed; restart the server",
+      "The query plan was corrupted; run VACUUM FULL"
+    ],
+    ans: 1,
+    exp: "If statistics are stale (e.g. after a large INSERT/UPDATE), the planner may estimate that more rows match than actually do, making a Seq Scan seem cheaper. Running ANALYZE refreshes statistics so the planner correctly chooses an Index Scan."
+  },
+  {
+    cat: "Scenario",
+    q: `You need to delete 10 million rows from a large table with minimal locking impact. What is the recommended approach?`,
+    opts: [
+      "DELETE FROM table WHERE condition; — one big statement",
+      "TRUNCATE TABLE — fastest option",
+      "Delete in batches (e.g. loops of DELETE ... LIMIT 10000) with commits between batches",
+      "DROP TABLE and recreate"
+    ],
+    ans: 2,
+    exp: "A single large DELETE holds locks for the duration and creates a huge amount of WAL/dead tuples. Batched deletes with commits between each batch minimize lock duration, prevent autovacuum lag, and reduce transaction log pressure."
+  },
+  {
+    cat: "Scenario",
+    q: `A report query runs a complex aggregation every minute. Performance is degrading. Which technique best addresses this without changing the query logic?`,
+    opts: [
+      "Add more indexes to the base table",
+      "Create a MATERIALIZED VIEW and refresh it periodically",
+      "Increase max_connections",
+      "Add LIMIT to the query"
+    ],
+    ans: 1,
+    exp: "A MATERIALIZED VIEW pre-computes and stores the query result. Refreshing it periodically (via REFRESH MATERIALIZED VIEW CONCURRENTLY) separates expensive computation from serving. Queries hit the materialized result directly."
+  },
+  {
+    cat: "Scenario",
+    q: `Two transactions both try to UPDATE the same row simultaneously. Transaction A has <code class='inline'>BEGIN; UPDATE accounts SET balance = balance - 100 WHERE id = 1;</code>. Transaction B runs the same. What happens?`,
+    opts: [
+      "Both succeed immediately; last write wins",
+      "Transaction B blocks until Transaction A commits or rolls back, then proceeds with the updated value",
+      "Transaction B raises a deadlock error immediately",
+      "Both fail with a serialization error"
+    ],
+    ans: 1,
+    exp: "PostgreSQL uses row-level locking for UPDATE. Transaction B will block when it tries to lock the same row. Once A commits, B proceeds using the post-commit value (at READ COMMITTED). Under REPEATABLE READ/SERIALIZABLE, B may get a serialization error instead."
+  },
+  {
+    cat: "Scenario",
+    q: `You need to <em>upsert</em> — insert a row or update it if the key already exists. Which PostgreSQL syntax does this?`,
+    opts: [
+      "MERGE INTO ... USING ...",
+      "INSERT INTO ... ON CONFLICT (id) DO UPDATE SET ...",
+      "UPDATE ... IF NOT EXISTS ...",
+      "REPLACE INTO ..."
+    ],
+    ans: 1,
+    exp: "PostgreSQL's INSERT ... ON CONFLICT (target) DO UPDATE SET ... is the upsert syntax. ON CONFLICT DO NOTHING silently skips conflicts. The MERGE statement was added in PostgreSQL 15."
+  },
+  {
+    cat: "Scenario",
+    q: `Your query has a subquery in the WHERE clause that references the outer table. What is this called, and should it be rewritten?
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>SELECT</span> * <span class='kw'>FROM</span> <span class='tbl'>orders</span> o
+<span class='kw'>WHERE</span> amount > (<span class='kw'>SELECT</span> <span class='fn'>AVG</span>(amount) <span class='kw'>FROM</span> <span class='tbl'>orders</span>);
+</div>`,
+    opts: [
+      "Correlated subquery — runs once per outer row — always rewrite",
+      "Uncorrelated subquery — runs once for the whole query — generally fine as-is",
+      "This is a lateral join — requires LATERAL keyword",
+      "This will always result in a Seq Scan"
+    ],
+    ans: 1,
+    exp: "This subquery does NOT reference the outer query's columns, so it is uncorrelated. PostgreSQL evaluates it once and caches the result. The planner can often optimize this. A correlated subquery references outer columns and re-executes per row."
+  },
+  {
+    cat: "Scenario",
+    q: `You want to find all employees whose salary is above the average salary of their OWN department. Which query is correct?
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>SELECT</span> e.name, e.salary, e.dept
+<span class='kw'>FROM</span> <span class='tbl'>employees</span> e
+<span class='kw'>WHERE</span> e.salary > (
+  <span class='kw'>SELECT</span> <span class='fn'>AVG</span>(salary) <span class='kw'>FROM</span> <span class='tbl'>employees</span>
+  <span class='kw'>WHERE</span> dept = e.dept
+);
+</div>`,
+    opts: [
+      "Wrong — cannot reference e.dept in subquery",
+      "Correct — this is a correlated subquery computing avg per department for each row",
+      "This returns all employees because AVG is always lower than MAX",
+      "This should use a JOIN instead — subquery approach is invalid"
+    ],
+    ans: 1,
+    exp: "This is a valid correlated subquery. For each row of the outer query, the subquery computes AVG(salary) for that row's department. It correctly filters employees earning above their department's average."
+  },
+  {
+    cat: "Scenario",
+    q: `You see this in EXPLAIN ANALYZE output: <code class='inline'>Rows Removed by Filter: 950000</code> with <code class='inline'>Index Scan</code>. What does this indicate?`,
+    opts: [
+      "The index is very efficient",
+      "The index scan is fetching too many rows that are then filtered out — low selectivity; a better index or query rewrite is needed",
+      "Autovacuum is removing dead rows",
+      "950000 rows were returned to the client"
+    ],
+    ans: 1,
+    exp: "'Rows Removed by Filter' means the index retrieved rows but the filter condition (often a non-indexed predicate) discarded most of them. This suggests the index is not selective enough for this query, or a multi-column index should be considered."
+  },
+  {
+    cat: "Scenario",
+    q: `What is the purpose of <code class='inline'>pg_stat_statements</code>?`,
+    opts: [
+      "A tool to view live table locks",
+      "An extension that tracks execution statistics (calls, total time, rows) for every distinct query shape run against the database",
+      "A view showing table sizes",
+      "A tool for logical replication monitoring"
+    ],
+    ans: 1,
+    exp: "pg_stat_statements tracks planning and execution statistics normalized per query type. It's the primary tool for identifying slow or frequently called queries. Key columns: calls, total_exec_time, mean_exec_time, rows, query."
+  },
+  {
+    cat: "Scenario",
+    q: `You add an index on <code class='inline'>orders(created_at)</code> but the planner still does Seq Scan for <code class='inline'>WHERE created_at > NOW() - INTERVAL '7 days'</code> on a 10-million row table where 70% of rows are from the last 7 days. Why?`,
+    opts: [
+      "The index was not created correctly",
+      "The planner correctly chose Seq Scan because the index would return too many rows (70% of table) making index+heap fetches more expensive than sequential read",
+      "The interval syntax is not indexable",
+      "NOW() is a volatile function that prevents index use"
+    ],
+    ans: 1,
+    exp: "When a condition matches a large fraction of rows (here ~70%), PostgreSQL's planner determines that random heap access via index + row fetch is more expensive than a simple sequential scan. The threshold is roughly 5-15% selectivity for index scan to win."
+  },
+  {
+    cat: "Scenario",
+    q: `Which of these correctly paginates results and is <em>more efficient</em> for deep pagination on large tables?`,
+    opts: [
+      "<code class='inline'>SELECT * FROM t ORDER BY id LIMIT 20 OFFSET 100000</code>",
+      "<code class='inline'>SELECT * FROM t WHERE id > :last_seen_id ORDER BY id LIMIT 20</code> (keyset pagination)",
+      "Both are equally efficient",
+      "Cursor-based pagination only — LIMIT/OFFSET is never efficient"
+    ],
+    ans: 1,
+    exp: "OFFSET 100000 makes PostgreSQL fetch and discard 100,000 rows before returning results — it gets progressively slower with depth. Keyset/cursor-based pagination (WHERE id > last_seen) uses an index seek directly to the right position, remaining fast regardless of depth."
+  },
+  {
+    cat: "Scenario",
+    q: `You need to pivot rows into columns — one column per product category showing total sales. Which PostgreSQL feature is most appropriate?`,
+    opts: [
+      "ROLLUP",
+      "Conditional aggregation: SUM(CASE WHEN category = 'X' THEN amount END) per column",
+      "ARRAY_AGG into a single column",
+      "pg_pivot extension (built-in)"
+    ],
+    ans: 1,
+    exp: "PostgreSQL has no built-in PIVOT syntax. The standard approach is conditional aggregation: SELECT SUM(CASE WHEN cat='A' THEN amount ELSE 0 END) AS a_sales, SUM(CASE WHEN cat='B' THEN amount ELSE 0 END) AS b_sales FROM orders. The tablefunc extension provides crosstab() for more dynamic pivots."
+  },
+  {
+    cat: "Scenario",
+    q: `What is the output of this query given the table data?
+<div class='data-table-wrap'><table class='data-table'><thead><tr><th>id</th><th>manager_id</th><th>name</th></tr></thead><tbody>
+<tr><td>1</td><td>NULL</td><td>CEO</td></tr>
+<tr><td>2</td><td>1</td><td>VP</td></tr>
+<tr><td>3</td><td>2</td><td>Manager</td></tr>
+</tbody></table></div>
+<div class='code-block'><span class='lang-tag'>SQL</span>
+<span class='kw'>WITH RECURSIVE</span> org(id, name, level) <span class='kw'>AS</span> (
+  <span class='kw'>SELECT</span> id, name, <span class='num'>1</span> <span class='kw'>FROM</span> <span class='tbl'>staff</span> <span class='kw'>WHERE</span> manager_id <span class='kw'>IS NULL</span>
+  <span class='kw'>UNION ALL</span>
+  <span class='kw'>SELECT</span> s.id, s.name, o.level+<span class='num'>1</span>
+  <span class='kw'>FROM</span> <span class='tbl'>staff</span> s <span class='kw'>JOIN</span> org o <span class='kw'>ON</span> s.manager_id = o.id
+)
+<span class='kw'>SELECT</span> * <span class='kw'>FROM</span> org;
+</div>`,
+    opts: [
+      "Just the CEO row",
+      "CEO (level 1), VP (level 2), Manager (level 3) — 3 rows",
+      "Infinite loop",
+      "Only Manager (level 3)"
+    ],
+    ans: 1,
+    exp: "The base case selects the CEO (manager_id IS NULL, level 1). Recursion adds VP (manager_id = 1, level 2), then Manager (manager_id = 2, level 3). No more rows satisfy the join, so recursion stops. Result: 3 rows with levels 1, 2, 3."
+  },
+];
+
+// ── State ──────────────────────────────────────────────────────────────────
+const userAnswers = new Array(questions.length).fill(null);
+let startTime = Date.now();
+
+// ── Build Quiz ─────────────────────────────────────────────────────────────
+function buildQuiz() {
+  const container = document.getElementById('questions-container');
+  questions.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `q-card-${i}`;
+    const keys = ['A', 'B', 'C', 'D'];
+    const optsHtml = q.opts.map((opt, j) => `
+      <label class="option-label" id="opt-${i}-${j}" onclick="selectAnswer(${i}, ${j})">
+        <input type="radio" name="q${i}" value="${j}">
+        <div class="option-dot"></div>
+        <span class="option-key">${keys[j]}</span>
+        <span class="option-text">${opt}</span>
+      </label>`).join('');
+
+    card.innerHTML = `
+      <div class="q-header">
+        <div class="q-number">Q${i+1}</div>
+        <div class="q-category">${q.cat}</div>
+        <div class="q-text">${q.q}</div>
+      </div>
+      <div class="options" id="opts-${i}">${optsHtml}</div>`;
+    container.appendChild(card);
+  });
+}
+
+function selectAnswer(qi, oi) {
+  const prev = userAnswers[qi];
+  userAnswers[qi] = oi;
+  if (prev !== null && prev !== oi) {
+    document.getElementById(`opt-${qi}-${prev}`).classList.remove('selected');
+  }
+  document.getElementById(`opt-${qi}-${oi}`).classList.add('selected');
+  document.getElementById(`q-card-${qi}`).classList.add('answered');
+  updateProgress();
+}
+
+function updateProgress() {
+  const answered = userAnswers.filter(a => a !== null).length;
+  document.getElementById('hdr-answered').textContent = answered;
+  document.getElementById('sz-answered').textContent = answered;
+  document.getElementById('prog-text').textContent = `${answered} / ${questions.length}`;
+  document.getElementById('progress-fill').style.width = `${(answered / questions.length) * 100}%`;
+}
+
+// ── Submit ─────────────────────────────────────────────────────────────────
+function submitQuiz() {
+  const elapsed = Math.round((Date.now() - startTime) / 1000);
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+
+  let correct = 0, wrong = 0, skipped = 0;
+  userAnswers.forEach((ans, i) => {
+    if (ans === null) skipped++;
+    else if (ans === questions[i].ans) correct++;
+    else wrong++;
+  });
+
+  const pct = Math.round((correct / questions.length) * 100);
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('score-screen').style.display = 'block';
+
+  document.getElementById('score-pct').textContent = `${pct}%`;
+  document.getElementById('sc-correct').textContent = correct;
+  document.getElementById('sc-wrong').textContent = wrong;
+  document.getElementById('sc-skip').textContent = skipped;
+  document.getElementById('sc-time').textContent = `${mins}m ${secs}s`;
+  document.getElementById('score-emoji').textContent =
+    pct >= 80 ? '🏆' : pct >= 60 ? '💪' : pct >= 40 ? '📚' : '🔁';
+
+  buildReview();
+  window.scrollTo(0, 0);
+}
+
+// ── Review ─────────────────────────────────────────────────────────────────
+function buildReview() {
+  const container = document.getElementById('review-container');
+  const keys = ['A', 'B', 'C', 'D'];
+  questions.forEach((q, i) => {
+    const ua = userAnswers[i];
+    const correct = q.ans;
+    let statusCls, statusTxt;
+    if (ua === null) { statusCls = 'status-skip'; statusTxt = '— Skipped'; }
+    else if (ua === correct) { statusCls = 'status-correct'; statusTxt = '✓ Correct'; }
+    else { statusCls = 'status-wrong'; statusTxt = '✗ Wrong'; }
+
+    const optsHtml = q.opts.map((opt, j) => {
+      let cls = 'r-neutral';
+      if (j === correct) cls = 'r-correct';
+      else if (j === ua && ua !== correct) cls = 'r-wrong';
+      const mark = j === correct ? '✓' : (j === ua && ua !== correct ? '✗' : '○');
+      return `<div class="review-opt ${cls}"><span>${mark} ${keys[j]}.</span><span>${opt}</span></div>`;
+    }).join('');
+
+    const card = document.createElement('div');
+    card.className = 'review-card';
+    card.innerHTML = `
+      <div class="review-status ${statusCls}">${statusTxt}</div>
+      <div class="review-q">Q${i+1}. ${q.q}</div>
+      <div class="review-options">${optsHtml}</div>
+      <div class="explanation"><strong>Explanation:</strong> ${q.exp}</div>`;
+    container.appendChild(card);
+  });
+}
+
+// ── Retake ─────────────────────────────────────────────────────────────────
+function retakeQuiz() {
+  userAnswers.fill(null);
+  startTime = Date.now();
+  document.getElementById('review-container').innerHTML = '';
+  document.getElementById('score-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  document.querySelectorAll('.option-label').forEach(l => l.classList.remove('selected'));
+  document.querySelectorAll('.question-card').forEach(c => c.classList.remove('answered'));
+  updateProgress();
+  window.scrollTo(0, 0);
+}
+
+// ── PDF Generation ─────────────────────────────────────────────────────────
+function generatePDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pageW = 210, pageH = 297;
+  const margin = 18, contentW = pageW - margin * 2;
+  let y = 20;
+
+  const colors = { accent: [0, 200, 160], dark: [13, 17, 23], surface: [22, 27, 34], text: [230, 237, 243], muted: [125, 133, 144], correct: [63, 185, 80], wrong: [248, 81, 73], warn: [210, 153, 34] };
+
+  const newPage = () => {
+    doc.addPage();
+    y = 20;
+  };
+
+  const checkPage = (needed = 12) => { if (y + needed > pageH - 15) newPage(); };
+
+  const setColor = (rgb, fill = false) => fill ? doc.setFillColor(...rgb) : doc.setTextColor(...rgb);
+
+  // ── Cover Page
+  doc.setFillColor(...colors.dark);
+  doc.rect(0, 0, pageW, pageH, 'F');
+
+  doc.setFillColor(...colors.accent);
+  doc.roundedRect(margin, 60, contentW, 2, 1, 1, 'F');
+
+  setColor(colors.accent);
+  doc.setFontSize(32); doc.setFont('helvetica', 'bold');
+  doc.text('PostgreSQL', pageW / 2, 85, { align: 'center' });
+  doc.text('MCQ Quiz Report', pageW / 2, 97, { align: 'center' });
+
+  setColor(colors.muted);
+  doc.setFontSize(11); doc.setFont('helvetica', 'normal');
+  doc.text('50 Scenario-Based Questions — 2 Years Experience Level', pageW / 2, 110, { align: 'center' });
+
+  const correct = userAnswers.filter((a, i) => a === questions[i].ans).length;
+  const wrong = userAnswers.filter((a, i) => a !== null && a !== questions[i].ans).length;
+  const skipped = userAnswers.filter(a => a === null).length;
+  const pct = Math.round((correct / questions.length) * 100);
+
+  // Score box
+  doc.setFillColor(22, 27, 34);
+  doc.roundedRect(margin, 125, contentW, 70, 6, 6, 'F');
+  doc.setDrawColor(...colors.accent);
+  doc.setLineWidth(0.5);
+  doc.roundedRect(margin, 125, contentW, 70, 6, 6, 'S');
+
+  setColor(colors.accent);
+  doc.setFontSize(48); doc.setFont('helvetica', 'bold');
+  doc.text(`${pct}%`, pageW / 2, 163, { align: 'center' });
+
+  setColor(colors.muted);
+  doc.setFontSize(11); doc.setFont('helvetica', 'normal');
+  doc.text('Overall Score', pageW / 2, 172, { align: 'center' });
+
+  const colW = contentW / 3;
+  const stats = [['Correct', correct, colors.correct], ['Wrong', wrong, colors.wrong], ['Skipped', skipped, colors.warn]];
+  stats.forEach(([lbl, val, clr], i) => {
+    const cx = margin + colW * i + colW / 2;
+    setColor(clr);
+    doc.setFontSize(22); doc.setFont('helvetica', 'bold');
+    doc.text(String(val), cx, 186, { align: 'center' });
+    setColor(colors.muted);
+    doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+    doc.text(lbl, cx, 192, { align: 'center' });
+  });
+
+  setColor(colors.muted);
+  doc.setFontSize(9);
+  doc.text(`Generated: ${new Date().toLocaleString()}`, pageW / 2, pageH - 12, { align: 'center' });
+
+  // ── Answer Pages
+  doc.addPage();
+  doc.setFillColor(...colors.dark);
+  doc.rect(0, 0, pageW, pageH, 'F');
+  y = 20;
+
+  setColor(colors.accent);
+  doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+  doc.text('Detailed Answer Report', margin, y);
+  y += 10;
+
+  const keys = ['A', 'B', 'C', 'D'];
+
+  questions.forEach((q, qi) => {
+    const ua = userAnswers[qi];
+    const isCorrect = ua === q.ans;
+    const isSkip = ua === null;
+
+    checkPage(35);
+
+    // Question header bar
+    const barColor = isSkip ? colors.warn : isCorrect ? colors.correct : colors.wrong;
+    doc.setFillColor(...barColor);
+    doc.roundedRect(margin, y, contentW, 7, 2, 2, 'F');
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(8); doc.setFont('helvetica', 'bold');
+    const statusStr = isSkip ? 'SKIPPED' : isCorrect ? '✓ CORRECT' : '✗ WRONG';
+    doc.text(`Q${qi + 1}  |  ${q.cat}  |  ${statusStr}`, margin + 3, y + 4.5);
+    y += 10;
+
+    // Question text (strip HTML tags)
+    const qText = q.q.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 200);
+    setColor(colors.text);
+    doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+    const qLines = doc.splitTextToSize(qText, contentW);
+    qLines.forEach(line => { checkPage(5); doc.text(line, margin, y); y += 5; });
+    y += 2;
+
+    // Options
+    q.opts.forEach((opt, oi) => {
+      checkPage(6);
+      const optText = opt.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+      let optColor = colors.muted;
+      let prefix = `  ${keys[oi]}. `;
+      if (oi === q.ans) { optColor = colors.correct; prefix = `✓ ${keys[oi]}. `; }
+      if (oi === ua && ua !== q.ans) { optColor = colors.wrong; prefix = `✗ ${keys[oi]}. `; }
+      setColor(optColor);
+      doc.setFontSize(8.5); doc.setFont('helvetica', oi === q.ans ? 'bold' : 'normal');
+      const optLines = doc.splitTextToSize(prefix + optText, contentW);
+      optLines.forEach(line => { checkPage(5); doc.text(line, margin + 2, y); y += 5; });
+    });
+
+    // Explanation
+    checkPage(8);
+    setColor(colors.accent);
+    doc.setFontSize(8); doc.setFont('helvetica', 'italic');
+    const expLines = doc.splitTextToSize('→ ' + q.exp, contentW);
+    expLines.forEach(line => { checkPage(5); doc.text(line, margin + 3, y); y += 5; });
+
+    y += 5;
+
+    // Separator
+    if (qi < questions.length - 1) {
+      checkPage(4);
+      doc.setDrawColor(...colors.surface);
+      doc.setLineWidth(0.3);
+      doc.line(margin, y, pageW - margin, y);
+      y += 5;
+    }
+  });
+
+  doc.save('PostgreSQL_Quiz_Report.pdf');
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+buildQuiz();
+updateProgress();
+</script>
+</body>
+</html>
