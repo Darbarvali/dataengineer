@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ADF · ADLS · Blob Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --bg: #f0f4ff;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --border: #dde3f5;
+  --blue: #0052cc;
+  --blue-light: #e8f0ff;
+  --teal: #00875a;
+  --teal-light: #e3f8ef;
+  --red: #de350b;
+  --red-light: #ffebe6;
+  --amber: #ff991f;
+  --amber-light: #fff7e6;
+  --text: #172b4d;
+  --muted: #6b778c;
+  --radius: 10px;
+  --shadow: 0 2px 12px rgba(0,82,204,0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+/* HEADER */
+header {
+  background: var(--blue);
+  padding: 0 32px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,52,130,0.18);
+}
+.logo {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.95rem;
+  color: #fff;
+  display: flex; align-items: center; gap: 8px;
+}
+.logo-dot { width: 8px; height: 8px; border-radius: 50%; background: #79b8ff; }
+.header-right { display: flex; align-items: center; gap: 14px; }
+.prog-text { font-size: 0.78rem; color: rgba(255,255,255,0.7); font-family: 'IBM Plex Mono', monospace; }
+.prog-outer { width: 140px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 99px; overflow: hidden; }
+.prog-inner { height: 100%; background: #79b8ff; border-radius: 99px; transition: width 0.35s ease; width: 0%; }
+
+/* INTRO */
+#intro-screen {
+  max-width: 680px; margin: 64px auto; padding: 0 24px; text-align: center;
+}
+.azure-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--blue-light);
+  border: 1px solid #b3c8ff;
+  color: var(--blue);
+  font-size: 0.72rem;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 1.2px;
+  padding: 6px 16px;
+  border-radius: 99px;
+  margin-bottom: 28px;
+}
+.azure-badge::before { content: '☁'; font-size: 1rem; }
+#intro-screen h1 { font-size: 2.6rem; font-weight: 700; line-height: 1.18; color: var(--text); margin-bottom: 16px; }
+#intro-screen h1 .hl { color: var(--blue); }
+#intro-screen p { color: var(--muted); font-size: 1rem; line-height: 1.75; margin-bottom: 40px; max-width: 520px; margin-left: auto; margin-right: auto; }
+.cards-row { display: flex; gap: 16px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 28px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  min-width: 120px;
+}
+.info-card .ic-num { font-family: 'IBM Plex Mono', monospace; font-size: 1.9rem; color: var(--blue); font-weight: 600; }
+.info-card .ic-lbl { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+.btn-start {
+  background: var(--blue);
+  color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 14px 40px;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,82,204,0.25);
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-start:hover { background: #003ea8; transform: translateY(-1px); }
+
+/* QUIZ */
+#quiz-screen { display: none; max-width: 740px; margin: 36px auto; padding: 0 24px; }
+
+.dots-bar { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 20px; }
+.q-dot {
+  width: 28px; height: 28px; border-radius: 7px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem; color: var(--muted);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s;
+}
+.q-dot:hover { border-color: var(--blue); color: var(--blue); }
+.q-dot.current { border-color: var(--blue); background: var(--blue-light); color: var(--blue); }
+.q-dot.answered { background: #e8e8f0; color: var(--text); border-color: #c0c8e0; }
+.q-dot.c-dot { background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
+.q-dot.w-dot { background: var(--red-light); border-color: var(--red); color: var(--red); }
+
+.section-label {
+  font-size: 0.72rem; font-family: 'IBM Plex Mono', monospace;
+  color: var(--muted); letter-spacing: 0.5px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 32px 36px 28px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+  animation: fadeUp 0.28s ease;
+}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.q-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+.q-badge {
+  background: var(--blue-light);
+  color: var(--blue);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.q-text { font-size: 1.08rem; font-weight: 500; line-height: 1.6; color: var(--text); }
+
+.opts { display: flex; flex-direction: column; gap: 9px; }
+.opt-lbl {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  background: var(--bg);
+  font-size: 0.93rem;
+  transition: border-color 0.13s, background 0.13s;
+  user-select: none;
+}
+.opt-lbl:hover { border-color: var(--blue); background: var(--blue-light); }
+.opt-lbl input { display: none; }
+.opt-lbl.sel { border-color: var(--blue); background: var(--blue-light); }
+.opt-lbl.ok  { border-color: var(--teal); background: var(--teal-light); }
+.opt-lbl.bad { border-color: var(--red); background: var(--red-light); }
+.opt-key {
+  width: 26px; height: 26px; border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem;
+  flex-shrink: 0; transition: all 0.13s; color: var(--muted);
+}
+.opt-lbl.sel .opt-key { background: var(--blue); border-color: var(--blue); color: #fff; }
+.opt-lbl.ok  .opt-key { background: var(--teal); border-color: var(--teal); color: #fff; }
+.opt-lbl.bad .opt-key { background: var(--red); border-color: var(--red); color: #fff; }
+
+.reveal-box {
+  margin-top: 14px; padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 0.86rem; font-weight: 500;
+  display: none;
+}
+.reveal-box.ok  { background: var(--teal-light); color: var(--teal); border: 1px solid #b3e6d3; }
+.reveal-box.bad { background: var(--red-light); color: var(--red); border: 1px solid #ffbdad; }
+
+.nav-row {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.btn-nav {
+  background: var(--surface); border: 1.5px solid var(--border);
+  color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.88rem; font-weight: 500;
+  padding: 10px 20px; border-radius: var(--radius);
+  cursor: pointer; transition: border-color 0.13s, background 0.13s;
+}
+.btn-nav:hover { border-color: var(--blue); background: var(--blue-light); color: var(--blue); }
+.btn-nav:disabled { opacity: 0.35; pointer-events: none; }
+.btn-sub {
+  background: var(--blue); color: #fff;
+  border: none; font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600; font-size: 0.9rem;
+  padding: 10px 26px; border-radius: var(--radius);
+  cursor: pointer; transition: background 0.13s;
+  box-shadow: 0 2px 8px rgba(0,82,204,0.2);
+}
+.btn-sub:hover { background: #003ea8; }
+.btn-sub:disabled { opacity: 0.35; pointer-events: none; }
+
+/* RESULTS */
+#result-screen { display: none; max-width: 680px; margin: 60px auto; padding: 0 24px; text-align: center; }
+.result-hero {
+  background: var(--blue);
+  border-radius: 18px;
+  padding: 48px 40px;
+  color: #fff;
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.result-hero::before {
+  content: '☁';
+  position: absolute;
+  font-size: 120px;
+  opacity: 0.06;
+  top: -10px; right: -10px;
+}
+.r-pct { font-family: 'IBM Plex Mono', monospace; font-size: 4rem; font-weight: 600; display: block; }
+.r-sub { font-size: 0.85rem; opacity: 0.75; margin-top: 4px; margin-bottom: 24px; }
+.r-title { font-size: 1.5rem; font-weight: 700; }
+.r-msg { font-size: 0.9rem; opacity: 0.8; margin-top: 8px; }
+.stats-row { display: flex; gap: 14px; margin-bottom: 28px; flex-wrap: wrap; }
+.stat-c {
+  flex: 1; min-width: 100px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 16px;
+  box-shadow: var(--shadow);
+}
+.stat-v { font-family: 'IBM Plex Mono', monospace; font-size: 1.8rem; font-weight: 600; }
+.sv-g { color: var(--teal); }
+.sv-r { color: var(--red); }
+.sv-a { color: var(--amber); }
+.stat-l { font-size: 0.73rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; }
+.res-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn-ghost2 {
+  background: var(--surface); border: 1.5px solid var(--border);
+  color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 500; font-size: 0.92rem;
+  padding: 12px 28px; border-radius: var(--radius);
+  cursor: pointer; transition: border-color 0.13s;
+}
+.btn-ghost2:hover { border-color: var(--blue); color: var(--blue); }
+.btn-pdf {
+  background: var(--blue); color: #fff;
+  border: none; font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600; font-size: 0.92rem;
+  padding: 12px 28px; border-radius: var(--radius);
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(0,82,204,0.2);
+  transition: background 0.13s;
+}
+.btn-pdf:hover { background: #003ea8; }
+
+@media (max-width: 600px) {
+  header { padding: 0 16px; }
+  .prog-outer { width: 80px; }
+  #intro-screen h1 { font-size: 1.8rem; }
+  .q-card { padding: 22px 18px 20px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><div class="logo-dot"></div>Azure · ADF · ADLS · Blob</div>
+  <div class="header-right">
+    <div class="prog-outer"><div class="prog-inner" id="prog"></div></div>
+    <span class="prog-text" id="prog-lbl">0 / 50</span>
+  </div>
+</header>
+
+<!-- INTRO -->
+<div id="intro-screen">
+  <div class="azure-badge">AZURE MCQ ASSESSMENT</div>
+  <h1>Azure <span class="hl">Data Services</span> Quiz</h1>
+  <p>Test your knowledge of Azure Data Factory, Azure Data Lake Storage, Blob Storage, and related cloud data integration concepts across 50 questions.</p>
+  <div class="cards-row">
+    <div class="info-card"><div class="ic-num">50</div><div class="ic-lbl">Questions</div></div>
+    <div class="info-card"><div class="ic-num">ADF</div><div class="ic-lbl">Data Factory</div></div>
+    <div class="info-card"><div class="ic-num">ADLS</div><div class="ic-lbl">Data Lake</div></div>
+    <div class="info-card"><div class="ic-num">PDF</div><div class="ic-lbl">Export</div></div>
+  </div>
+  <button class="btn-start" onclick="startQuiz()">Begin Assessment →</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz-screen">
+  <div class="dots-bar" id="dots"></div>
+  <div class="section-label" id="sec-lbl">Question 1 of 50</div>
+  <div class="q-card" id="q-card">
+    <div class="q-header">
+      <span class="q-badge" id="q-badge">Q01</span>
+      <div class="q-text" id="q-text"></div>
+    </div>
+    <div class="opts" id="q-opts"></div>
+    <div class="reveal-box" id="reveal"></div>
+  </div>
+  <div class="nav-row">
+    <button class="btn-nav" id="btn-prev" onclick="go(-1)">← Previous</button>
+    <button class="btn-sub" id="btn-sub" onclick="submitAns()">Submit Answer</button>
+    <button class="btn-nav" id="btn-next" onclick="go(1)">Next →</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="result-screen">
+  <div class="result-hero">
+    <span class="r-pct" id="r-pct">0%</span>
+    <div class="r-sub" id="r-sub">0 out of 50 correct</div>
+    <div class="r-title" id="r-title">Quiz Complete!</div>
+    <div class="r-msg" id="r-msg"></div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-c"><div class="stat-v sv-g" id="s-c">0</div><div class="stat-l">Correct</div></div>
+    <div class="stat-c"><div class="stat-v sv-r" id="s-w">0</div><div class="stat-l">Wrong</div></div>
+    <div class="stat-c"><div class="stat-v sv-a" id="s-s">0</div><div class="stat-l">Skipped</div></div>
+  </div>
+  <div class="res-btns">
+    <button class="btn-ghost2" onclick="retake()">↺ Retake Quiz</button>
+    <button class="btn-pdf" onclick="genPDF()">⬇ Download PDF Report</button>
+  </div>
+</div>
+
+<script>
+const QS = [
+  { q:"What is Azure Data Factory (ADF)?", opts:["IDE","Storage","Database","ETL service"], ans:"ETL service" },
+  { q:"ADF is primarily used for?", opts:["Networking","Gaming","UI design","Data integration"], ans:"Data integration" },
+  { q:"Which activity copies data?", opts:["If Condition","Lookup","Copy Activity","Delete"], ans:"Copy Activity" },
+  { q:"ADF pipelines are?", opts:["Logical group of activities","Databases","Tables","Storage units"], ans:"Logical group of activities" },
+  { q:"Which triggers pipeline execution?", opts:["Linked Service","Dataset","Trigger","Activity"], ans:"Trigger" },
+  { q:"Which activity executes SQL?", opts:["Copy Activity","Delete","Stored Procedure Activity","Lookup"], ans:"Stored Procedure Activity" },
+  { q:"Lookup activity is used for?", opts:["Moving data","Deleting data","Transforming","Fetching data"], ans:"Fetching data" },
+  { q:"Which activity deletes data?", opts:["Copy","Join","Lookup","Delete Activity"], ans:"Delete Activity" },
+  { q:"ADF supports which transformation?", opts:["Data Flow","Sorting only","Partitioning","Indexing"], ans:"Data Flow" },
+  { q:"What is ADLS?", opts:["App Service","Data Lake Storage","Database","Cluster"], ans:"Data Lake Storage" },
+  { q:"ADLS Gen2 is built on?", opts:["Blob Storage","SQL","VM","Kubernetes"], ans:"Blob Storage" },
+  { q:"Blob storage is used for?", opts:["Compute","Relational data","Object storage","Networking"], ans:"Object storage" },
+  { q:"Container in Blob is?", opts:["Cluster","Folder-like structure","File","DB"], ans:"Folder-like structure" },
+  { q:"Linked Service represents?", opts:["Connection string","Table","Pipeline","Trigger"], ans:"Connection string" },
+  { q:"Dataset represents?", opts:["Cluster","Pipeline","Trigger","Data structure"], ans:"Data structure" },
+  { q:"Integration Runtime is?", opts:["API","Storage","Compute infrastructure","UI"], ans:"Compute infrastructure" },
+  { q:"Self-hosted IR is used for?", opts:["UI","On-prem data","Cloud only","ML"], ans:"On-prem data" },
+  { q:"Azure IR is?", opts:["Storage","Cloud compute","UI","Local compute"], ans:"Cloud compute" },
+  { q:"Pipeline parameter is?", opts:["Column","Dynamic input","Table","Static value"], ans:"Dynamic input" },
+  { q:"Variable in ADF is?", opts:["Dataset","Runtime storage","Table","Trigger"], ans:"Runtime storage" },
+  { q:"If Condition activity is?", opts:["Delete","Copy","Conditional logic","Loop"], ans:"Conditional logic" },
+  { q:"ForEach activity is?", opts:["Join","Filter","Condition","Loop"], ans:"Loop" },
+  { q:"Until activity is?", opts:["Single run","Delete","Copy","Loop until condition"], ans:"Loop until condition" },
+  { q:"Web activity is?", opts:["API call","Copy","Delete","DB query"], ans:"API call" },
+  { q:"ADF supports which format?", opts:["CSV","All","JSON","Parquet"], ans:"All" },
+  { q:"Mapping Data Flow is?", opts:["Trigger","Visual transformation","Storage","Dataset"], ans:"Visual transformation" },
+  { q:"Filter transformation is?", opts:["Row filtering","Aggregate","Join","Sort"], ans:"Row filtering" },
+  { q:"Join transformation is?", opts:["Filter","Sort","Combine datasets","Delete"], ans:"Combine datasets" },
+  { q:"Aggregate transformation is?", opts:["Filter","Join","Group data","Delete"], ans:"Group data" },
+  { q:"Derived column is?", opts:["Delete","Sort","Join","Add/modify column"], ans:"Add/modify column" },
+  { q:"Sink is?", opts:["Trigger","Pipeline","Destination","Source"], ans:"Destination" },
+  { q:"Source is?", opts:["Input data","Output","Trigger","Compute"], ans:"Input data" },
+  { q:"Debug mode is used for?", opts:["Delete","Production","Testing","Deployment"], ans:"Testing" },
+  { q:"Publish in ADF means?", opts:["Run","Delete","Test","Deploy changes"], ans:"Deploy changes" },
+  { q:"Trigger types include?", opts:["Event","All","Schedule","Manual"], ans:"All" },
+  { q:"Event trigger is?", opts:["File-based trigger","Time-based","Manual","None"], ans:"File-based trigger" },
+  { q:"Schedule trigger is?", opts:["None","File-based","Manual","Time-based"], ans:"Time-based" },
+  { q:"Manual trigger is?", opts:["On-demand","Time","File","Auto"], ans:"On-demand" },
+  { q:"Copy activity supports?", opts:["Delete","No copy","Parallel copy","Single thread"], ans:"Parallel copy" },
+  { q:"Staging is used for?", opts:["Final output","UI","Compute","Temporary storage"], ans:"Temporary storage" },
+  { q:"Data Flow runs on?", opts:["Blob","VM","Spark cluster","SQL"], ans:"Spark cluster" },
+  { q:"Schema drift is?", opts:["Error","Fixed schema","Flexible schema","None"], ans:"Flexible schema" },
+  { q:"Partitioning helps?", opts:["Delete","UI","Performance","Storage"], ans:"Performance" },
+  { q:"Watermark is used for?", opts:["Delete","Full load","Incremental load","UI"], ans:"Incremental load" },
+  { q:"Integration runtime types?", opts:["Azure, Self-hosted, SSIS","Only Azure","Only Local","None"], ans:"Azure, Self-hosted, SSIS" },
+  { q:"SSIS IR is used for?", opts:["Lift and shift","Storage","Delete","UI"], ans:"Lift and shift" },
+  { q:"Blob tiers include?", opts:["Fast, Slow","None","Hot, Cool, Archive","Cold, Warm"], ans:"Hot, Cool, Archive" },
+  { q:"Data Lake zones?", opts:["Raw, Curated, Trusted","Only Curated","Only Raw","None"], ans:"Raw, Curated, Trusted" },
+  { q:"ADF monitoring is done via?", opts:["Dataset","Trigger","Monitor tab","Pipeline"], ans:"Monitor tab" },
+  { q:"Retry policy is?", opts:["Join","Delete","Sort","Error handling"], ans:"Error handling" }
+];
+
+const KEYS = ['A','B','C','D'];
+let cur = 0;
+let ua = new Array(QS.length).fill(null);
+let sub = new Array(QS.length).fill(false);
+
+function startQuiz() {
+  document.getElementById('intro-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  buildDots(); render(0);
+}
+
+function buildDots() {
+  const w = document.getElementById('dots');
+  w.innerHTML = '';
+  QS.forEach((_,i) => {
+    const d = document.createElement('div');
+    d.className = 'q-dot'; d.textContent = i+1;
+    d.onclick = () => { cur = i; render(i); };
+    w.appendChild(d);
+  });
+}
+
+function updateDots() {
+  document.querySelectorAll('.q-dot').forEach((d,i) => {
+    d.className = 'q-dot';
+    if (i === cur) d.classList.add('current');
+    else if (sub[i]) d.classList.add(ua[i]===QS[i].ans ? 'c-dot' : 'w-dot');
+    else if (ua[i]) d.classList.add('answered');
+  });
+}
+
+function render(idx) {
+  cur = idx;
+  const q = QS[idx];
+  document.getElementById('q-badge').textContent = `Q${String(idx+1).padStart(2,'0')}`;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('sec-lbl').textContent = `Question ${idx+1} of ${QS.length}`;
+
+  const optsEl = document.getElementById('q-opts');
+  optsEl.innerHTML = '';
+  q.opts.forEach((o, i) => {
+    const lbl = document.createElement('label');
+    lbl.className = 'opt-lbl';
+    if (ua[idx]===o) lbl.classList.add('sel');
+    if (sub[idx]) {
+      if (o===q.ans) lbl.classList.add('ok');
+      else if (ua[idx]===o) lbl.classList.add('bad');
+    }
+    const inp = document.createElement('input');
+    inp.type='radio'; inp.name='opt'; inp.value=o;
+    if (ua[idx]===o) inp.checked=true;
+    if (sub[idx]) inp.disabled=true;
+    inp.addEventListener('change', () => pick(o, lbl));
+
+    const key = document.createElement('div');
+    key.className = 'opt-key'; key.textContent = KEYS[i];
+
+    lbl.appendChild(inp); lbl.appendChild(key);
+    lbl.appendChild(document.createTextNode(o));
+    optsEl.appendChild(lbl);
+  });
+
+  const rev = document.getElementById('reveal');
+  rev.style.display = 'none'; rev.className = 'reveal-box';
+  if (sub[idx]) {
+    const ok = ua[idx]===q.ans;
+    rev.style.display = 'block';
+    rev.classList.add(ok ? 'ok' : 'bad');
+    rev.innerHTML = ok
+      ? `✓ Correct! <strong>${q.ans}</strong>`
+      : `✗ Incorrect. Correct answer: <strong>${q.ans}</strong>`;
+  }
+
+  document.getElementById('btn-prev').disabled = idx===0;
+  document.getElementById('btn-next').disabled = idx===QS.length-1;
+  document.getElementById('btn-sub').disabled = sub[idx] || !ua[idx];
+
+  const done = sub.filter(Boolean).length;
+  document.getElementById('prog').style.width = Math.round(done/QS.length*100)+'%';
+  document.getElementById('prog-lbl').textContent = `${done} / ${QS.length}`;
+
+  updateDots();
+}
+
+function pick(val, lbl) {
+  ua[cur] = val;
+  document.querySelectorAll('.opt-lbl').forEach(l => l.classList.remove('sel'));
+  lbl.classList.add('sel');
+  document.getElementById('btn-sub').disabled = false;
+}
+
+function submitAns() {
+  if (!ua[cur]) return;
+  sub[cur] = true;
+  render(cur);
+  if (cur < QS.length-1) setTimeout(()=>go(1), 850);
+  if (sub.every(Boolean)) setTimeout(showResults, 1200);
+}
+
+function go(dir) {
+  const n = cur + dir;
+  if (n>=0 && n<QS.length) render(n);
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'block';
+  const correct = QS.filter((q,i)=>ua[i]===q.ans).length;
+  const wrong   = QS.filter((q,i)=>sub[i]&&ua[i]!==q.ans).length;
+  const skip    = QS.filter((_,i)=>!sub[i]).length;
+  const pct = Math.round(correct/QS.length*100);
+  document.getElementById('s-c').textContent = correct;
+  document.getElementById('s-w').textContent = wrong;
+  document.getElementById('s-s').textContent = skip;
+  document.getElementById('r-pct').textContent = pct+'%';
+  document.getElementById('r-sub').textContent = `${correct} out of ${QS.length} correct`;
+  const [t,m] = pct>=80 ? ['Excellent! ☁','You have strong Azure Data Services knowledge.']
+    : pct>=60 ? ['Good Work! 👍','Solid understanding — review the missed topics.']
+    : ['Keep Learning! 💡','Revisit ADF, ADLS, and Blob fundamentals.'];
+  document.getElementById('r-title').textContent = t;
+  document.getElementById('r-msg').textContent = m;
+}
+
+function retake() {
+  ua = new Array(QS.length).fill(null);
+  sub = new Array(QS.length).fill(false);
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  render(0);
+}
+
+function genPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'mm', format:'a4' });
+  const W=210, M=18, cW=W-M*2;
+  let y=20;
+
+  const correct = QS.filter((q,i)=>ua[i]===q.ans).length;
+  const pct = Math.round(correct/QS.length*100);
+
+  // Header bar
+  doc.setFillColor(0, 82, 204);
+  doc.rect(0, 0, 210, 32, 'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(14);
+  doc.setTextColor(255,255,255);
+  doc.text('Azure ADF · ADLS · Blob — Quiz Report', M, 14);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','normal');
+  doc.setTextColor(180,200,255);
+  doc.text(`Score: ${correct} / ${QS.length}  (${pct}%)   |   ${new Date().toLocaleString()}`, M, 23);
+  y = 42;
+
+  QS.forEach((q, i) => {
+    if (y > 268) {
+      doc.addPage();
+      doc.setFillColor(0,82,204); doc.rect(0,0,210,10,'F');
+      y = 18;
+    }
+    const isOk = ua[i]===q.ans;
+    const wasSub = sub[i];
+
+    doc.setFontSize(8.5);
+    doc.setFont('helvetica','bold');
+    if (!wasSub) doc.setTextColor(120,120,140);
+    else if (isOk) doc.setTextColor(0,135,90);
+    else doc.setTextColor(222,53,11);
+
+    const mark = !wasSub ? '–' : (isOk ? '✓' : '✗');
+    doc.text(`Q${i+1}. ${mark}`, M, y);
+
+    doc.setTextColor(23,43,77);
+    doc.setFont('helvetica','normal');
+    const lines = doc.splitTextToSize(q.q, cW-18);
+    doc.text(lines, M+16, y);
+    y += lines.length*5+2;
+
+    if (ua[i]) {
+      doc.setFontSize(7.5);
+      doc.setTextColor(100,110,130);
+      doc.text('Your answer: ', M+16, y);
+      doc.setTextColor(isOk ? 0 : 180, isOk ? 120 : 40, isOk ? 80 : 11);
+      doc.text(ua[i], M+47, y);
+      y += 4.5;
+    }
+    if (wasSub && !isOk) {
+      doc.setFontSize(7.5);
+      doc.setTextColor(0,100,60);
+      doc.text(`Correct: ${q.ans}`, M+16, y);
+      y += 4.5;
+    }
+    y += 4;
+  });
+
+  doc.save('azure_adf_adls_quiz_report.pdf');
+}
+</script>
+</body>
+</html>
