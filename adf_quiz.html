@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ADF MCQ Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0c0f1a;
+    --surface: #131929;
+    --card: #192035;
+    --border: #1e2d4a;
+    --accent: #00c6ff;
+    --accent2: #7b61ff;
+    --success: #00e59b;
+    --danger: #ff4d6d;
+    --warning: #ffb347;
+    --text: #e8edf5;
+    --muted: #6b7fa3;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    background-image: radial-gradient(ellipse at 20% 0%, #0d1f4020 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 100%, #7b61ff12 0%, transparent 60%);
+  }
+
+  /* ── Header ── */
+  header {
+    background: linear-gradient(135deg, #0f1828 0%, #141d30 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .logo-block { display: flex; align-items: center; gap: 14px; }
+  .logo-icon {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 800;
+    color: #0c0f1a;
+  }
+  .logo-text { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px; }
+  .logo-sub { font-size: 0.72rem; color: var(--muted); font-family: 'IBM Plex Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
+
+  .header-right { display: flex; align-items: center; gap: 20px; }
+  .progress-ring-wrap { text-align: center; }
+  .progress-label { font-size: 0.68rem; color: var(--muted); font-family: 'IBM Plex Mono', monospace; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+  .progress-count { font-size: 1.1rem; font-weight: 700; color: var(--accent); font-family: 'IBM Plex Mono', monospace; }
+
+  /* ── Progress Bar ── */
+  .progress-bar-track {
+    background: var(--border);
+    height: 4px;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* ── Main ── */
+  main { max-width: 860px; margin: 0 auto; padding: 40px 20px 120px; }
+
+  .quiz-intro {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease both;
+  }
+  .quiz-intro h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -1px; }
+  .quiz-intro h1 span { background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .quiz-intro p { color: var(--muted); font-size: 0.95rem; margin-top: 10px; font-family: 'IBM Plex Mono', monospace; }
+
+  /* ── Question Card ── */
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 20px;
+    transition: border-color 0.3s;
+    animation: fadeUp 0.5s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+  .question-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .question-card.answered::before { opacity: 1; }
+
+  .q-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 22px; }
+  .q-num {
+    background: var(--border);
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    letter-spacing: 1px;
+  }
+  .q-text { font-size: 1.05rem; font-weight: 600; line-height: 1.55; }
+
+  /* ── Options ── */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option-label {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  .option-label:hover { border-color: var(--accent); background: #1a2540; }
+  .option-label input[type="radio"] { display: none; }
+
+  .option-dot {
+    width: 20px; height: 20px;
+    border: 2px solid var(--muted);
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .option-dot::after {
+    content: '';
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.2s;
+  }
+  .option-label:has(input:checked) .option-dot {
+    border-color: var(--accent);
+  }
+  .option-label:has(input:checked) .option-dot::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .option-label:has(input:checked) {
+    border-color: var(--accent);
+    background: #0d2035;
+  }
+
+  .option-letter {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    width: 18px;
+    flex-shrink: 0;
+  }
+  .option-text { font-size: 0.95rem; }
+
+  /* ── Result Highlights ── */
+  .option-label.correct {
+    border-color: var(--success) !important;
+    background: #00e59b12 !important;
+  }
+  .option-label.wrong {
+    border-color: var(--danger) !important;
+    background: #ff4d6d12 !important;
+  }
+  .option-label.correct .option-dot { border-color: var(--success); }
+  .option-label.correct .option-dot::after { background: var(--success); opacity: 1; transform: scale(1); }
+
+  /* ── Sticky Footer Actions ── */
+  .sticky-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(0deg, var(--bg) 60%, transparent);
+    padding: 24px 40px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    z-index: 200;
+  }
+
+  .btn {
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #0c0f1a;
+    box-shadow: 0 4px 20px #00c6ff30;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px #00c6ff40; }
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-pdf {
+    background: linear-gradient(135deg, #7b61ff, #a76bff);
+    color: white;
+    box-shadow: 0 4px 20px #7b61ff30;
+  }
+  .btn-pdf:hover { transform: translateY(-2px); box-shadow: 0 8px 28px #7b61ff45; }
+
+  /* ── Score Panel ── */
+  .score-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px;
+    text-align: center;
+    margin-bottom: 32px;
+    display: none;
+    animation: fadeUp 0.6s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+  .score-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, #00c6ff0a, transparent 70%);
+  }
+  .score-title { font-size: 1rem; color: var(--muted); font-family: 'IBM Plex Mono', monospace; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+  .score-number { font-size: 5rem; font-weight: 800; line-height: 1; letter-spacing: -4px; }
+  .score-number span { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .score-denom { font-size: 1.5rem; color: var(--muted); font-weight: 600; }
+  .score-pct { font-size: 1.1rem; color: var(--success); font-family: 'IBM Plex Mono', monospace; margin-top: 8px; }
+  .score-msg { font-size: 1rem; color: var(--muted); margin-top: 16px; }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Print / PDF Styles ── */
+  @media print {
+    body { background: white; color: #111; font-family: 'Segoe UI', sans-serif; }
+    header, .sticky-bar, .quiz-intro, .score-panel { display: none !important; }
+    main { padding: 20px; max-width: 100%; }
+    .question-card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .question-card::before { display: none; }
+    .q-num { background: #eee; color: #333; border-radius: 4px; }
+    .q-text { color: #111; }
+    .option-label {
+      background: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 10px 14px;
+    }
+    .option-label.correct { border-color: #00a86b !important; background: #edfff6 !important; }
+    .option-label.wrong { border-color: #e03050 !important; background: #fff0f3 !important; }
+    .option-label:has(input:checked):not(.correct):not(.wrong) { border-color: #0090cc; background: #f0faff; }
+    .option-dot { border-color: #aaa; }
+    .option-label.correct .option-dot::after { background: #00a86b; opacity: 1; transform: scale(1); }
+    .option-text, .option-letter { color: #222; }
+    .print-header {
+      display: block !important;
+      text-align: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #ddd;
+    }
+    .print-header h2 { font-size: 1.5rem; color: #111; }
+    .print-header p { color: #555; font-size: 0.9rem; margin-top: 4px; }
+    .print-score {
+      display: block !important;
+      text-align: center;
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+  }
+  .print-header, .print-score { display: none; }
+
+  /* ── Unanswered warning ── */
+  .unanswered-warn {
+    text-align: center;
+    color: var(--warning);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-block">
+    <div class="logo-icon">ADF</div>
+    <div>
+      <div class="logo-text">Azure Data Factory</div>
+      <div class="logo-sub">MCQ Assessment</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="progress-ring-wrap">
+      <div class="progress-label">Answered</div>
+      <div class="progress-count" id="ansCount">0 / 20</div>
+      <div class="progress-bar-track" style="width:120px">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Print-only header -->
+  <div class="print-header">
+    <h2>Azure Data Factory — MCQ Quiz Results</h2>
+    <p id="printDate"></p>
+  </div>
+  <div class="print-score" id="printScore"></div>
+
+  <div class="quiz-intro">
+    <h1>ADF <span>MCQ Quiz</span></h1>
+    <p>// 20 questions · select one option each · submit to check answers</p>
+  </div>
+
+  <div class="score-panel" id="scorePanel">
+    <div class="score-title">Your Score</div>
+    <div class="score-number"><span id="scoreNum">0</span><span class="score-denom"> / 20</span></div>
+    <div class="score-pct" id="scorePct"></div>
+    <div class="score-msg" id="scoreMsg"></div>
+  </div>
+
+  <div id="quizContainer"></div>
+  <div class="unanswered-warn" id="warnMsg">⚠ Please answer all questions before submitting.</div>
+</main>
+
+<div class="sticky-bar">
+  <button class="btn btn-outline" onclick="resetQuiz()">↺ Reset</button>
+  <button class="btn btn-primary" id="submitBtn" onclick="submitQuiz()">✓ Submit Quiz</button>
+  <button class="btn btn-pdf" id="pdfBtn" onclick="generatePDF()" style="display:none">⬇ Save PDF</button>
+</div>
+
+<script>
+const questions = [
+  { q: "Which activity is used to execute a stored procedure in ADF?", opts: ["Lookup","Stored Procedure","Web Activity","Execute Pipeline"], ans: 1 },
+  { q: "Which activity is used to pass data between pipelines?", opts: ["Copy Activity","Lookup Activity","Execute Pipeline","Data Flow"], ans: 2 },
+  { q: "What is the purpose of Lookup Activity?", opts: ["Copy data","Fetch metadata/data","Transform data","Trigger pipeline"], ans: 1 },
+  { q: "Which activity is used for conditional execution?", opts: ["If Condition","Switch","Filter","Both A and B"], ans: 3 },
+  { q: "What does Copy Activity do?", opts: ["Transform data","Move data","Delete data","Monitor pipeline"], ans: 1 },
+  { q: "Which activity is used to iterate over items?", opts: ["ForEach","Until","If","Filter"], ans: 0 },
+  { q: "Which activity is used for looping until condition is met?", opts: ["ForEach","Until","If Condition","Switch"], ans: 1 },
+  { q: "Which activity can call REST API?", opts: ["Web Activity","Copy Activity","Lookup","Execute Pipeline"], ans: 0 },
+  { q: "What is pipeline in ADF?", opts: ["Data store","Set of activities","Trigger","Dataset"], ans: 1 },
+  { q: "Which trigger runs pipeline on schedule?", opts: ["Tumbling Window","Schedule Trigger","Event Trigger","Manual"], ans: 1 },
+  { q: "Which activity is used to delete files?", opts: ["Delete Activity","Copy Activity","Lookup","Web"], ans: 0 },
+  { q: "Which activity transforms data at scale?", opts: ["Data Flow","Copy Activity","Lookup","Delete"], ans: 0 },
+  { q: "Which activity is used for branching logic?", opts: ["If Condition","Switch","Both A and B","ForEach"], ans: 2 },
+  { q: "Which activity retrieves output from SQL query?", opts: ["Lookup","Copy","Web","Execute Pipeline"], ans: 0 },
+  { q: "Which component defines structure of data?", opts: ["Linked Service","Dataset","Pipeline","Activity"], ans: 1 },
+  { q: "Which component defines connection?", opts: ["Dataset","Linked Service","Activity","Trigger"], ans: 1 },
+  { q: "Which activity is used to run another pipeline?", opts: ["Execute Pipeline","Lookup","Copy","Filter"], ans: 0 },
+  { q: "Which activity filters array items?", opts: ["Filter Activity","Lookup","If","Switch"], ans: 0 },
+  { q: "Which activity is used for waiting?", opts: ["Wait Activity","Until","ForEach","Lookup"], ans: 0 },
+  { q: "Which activity is used to handle failure paths?", opts: ["On Success","On Failure","On Completion","Retry"], ans: 1 },
+];
+
+const letters = ['A','B','C','D'];
+let submitted = false;
+
+function buildQuiz() {
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = '';
+  questions.forEach((q, qi) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `card-${qi}`;
+    card.style.animationDelay = `${qi * 0.04}s`;
+    card.innerHTML = `
+      <div class="q-header">
+        <span class="q-num">Q${String(qi+1).padStart(2,'0')}</span>
+        <div class="q-text">${q.q}</div>
+      </div>
+      <div class="options">
+        ${q.opts.map((opt, oi) => `
+          <label class="option-label" id="opt-${qi}-${oi}">
+            <input type="radio" name="q${qi}" value="${oi}" onchange="onSelect(${qi})"/>
+            <span class="option-dot"></span>
+            <span class="option-letter">${letters[oi]}.</span>
+            <span class="option-text">${opt}</span>
+          </label>
+        `).join('')}
+      </div>`;
+    container.appendChild(card);
+  });
+  updateProgress();
+}
+
+function onSelect(qi) {
+  document.getElementById(`card-${qi}`).classList.add('answered');
+  updateProgress();
+}
+
+function updateProgress() {
+  let count = 0;
+  questions.forEach((_, qi) => {
+    if (document.querySelector(`input[name="q${qi}"]:checked`)) count++;
+  });
+  document.getElementById('ansCount').textContent = `${count} / 20`;
+  document.getElementById('progressBar').style.width = `${(count/20)*100}%`;
+}
+
+function submitQuiz() {
+  if (submitted) return;
+
+  // Check all answered
+  const unanswered = questions.filter((_, qi) => !document.querySelector(`input[name="q${qi}"]:checked`));
+  if (unanswered.length > 0) {
+    const warn = document.getElementById('warnMsg');
+    warn.style.display = 'block';
+    setTimeout(() => warn.style.display = 'none', 3000);
+    return;
+  }
+
+  submitted = true;
+  let score = 0;
+
+  questions.forEach((q, qi) => {
+    const selected = document.querySelector(`input[name="q${qi}"]:checked`);
+    const selectedVal = parseInt(selected.value);
+    const correct = q.ans;
+
+    // Highlight all options
+    q.opts.forEach((_, oi) => {
+      const lbl = document.getElementById(`opt-${qi}-${oi}`);
+      if (oi === correct) lbl.classList.add('correct');
+      else if (oi === selectedVal && selectedVal !== correct) lbl.classList.add('wrong');
+    });
+
+    if (selectedVal === correct) score++;
+    document.getElementById(`card-${qi}`).classList.add('answered');
+
+    // Disable inputs
+    document.querySelectorAll(`input[name="q${qi}"]`).forEach(r => r.disabled = true);
+  });
+
+  // Score panel
+  const pct = Math.round((score / 20) * 100);
+  document.getElementById('scoreNum').textContent = score;
+  document.getElementById('scorePct').textContent = `${pct}%`;
+  const msgs = [
+    [0, 40, "Keep studying! Review ADF fundamentals."],
+    [40, 60, "Good effort! A bit more practice will help."],
+    [60, 80, "Well done! Solid understanding of ADF."],
+    [80, 100, "Excellent! You have a strong ADF grasp."],
+    [100, 101, "🎉 Perfect Score! Outstanding!"]
+  ];
+  const [,,msg] = msgs.find(([lo, hi]) => pct >= lo && pct < hi) || [0,0,""];
+  document.getElementById('scoreMsg').textContent = msg;
+  const panel = document.getElementById('scorePanel');
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  document.getElementById('submitBtn').style.display = 'none';
+  document.getElementById('pdfBtn').style.display = 'flex';
+
+  // Print score
+  document.getElementById('printDate').textContent = `Generated on: ${new Date().toLocaleString()}`;
+  document.getElementById('printScore').textContent = `Score: ${score} / 20 (${pct}%) — ${msg}`;
+}
+
+function resetQuiz() {
+  submitted = false;
+  document.getElementById('scorePanel').style.display = 'none';
+  document.getElementById('submitBtn').style.display = 'flex';
+  document.getElementById('pdfBtn').style.display = 'none';
+  document.getElementById('warnMsg').style.display = 'none';
+  buildQuiz();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function generatePDF() {
+  window.print();
+}
+
+buildQuiz();
+</script>
+</body>
+</html>
