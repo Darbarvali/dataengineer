@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Databricks Mastery Roadmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #ff6b35;
+    --accent2: #00d4ff;
+    --accent3: #a855f7;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    padding: 40px 20px;
+    background: radial-gradient(ellipse at 20% 50%, rgba(255,107,53,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(0,212,255,0.1) 0%, transparent 55%),
+                radial-gradient(ellipse at 60% 80%, rgba(168,85,247,0.08) 0%, transparent 50%);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(30,45,69,0.4) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30,45,69,0.4) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(255,107,53,0.3);
+    padding: 6px 18px;
+    border-radius: 2px;
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 800;
+    line-height: 0.95;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  .hero h1 span.spark { color: var(--accent); }
+  .hero h1 span.data { color: var(--accent2); }
+
+  .hero-sub {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 560px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--accent2);
+  }
+  .stat-label { font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(24px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* NAV TABS */
+  .tabs-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,14,26,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 16px 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s;
+    border-bottom: 2px solid transparent;
+    text-transform: uppercase;
+  }
+
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* SECTIONS */
+  .section { display: none; padding: 48px 24px; max-width: 1200px; margin: 0 auto; }
+  .section.active { display: block; }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .section-title span { color: var(--accent); }
+
+  .section-desc { color: var(--muted); font-size: 13px; margin-bottom: 40px; }
+
+  /* ROADMAP */
+  .roadmap {
+    position: relative;
+    padding-left: 32px;
+  }
+
+  .roadmap::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent2), var(--accent3));
+  }
+
+  .phase {
+    position: relative;
+    margin-bottom: 48px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .phase-dot {
+    position: absolute;
+    left: -38px;
+    top: 8px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--bg);
+    box-shadow: 0 0 12px rgba(255,107,53,0.4);
+  }
+
+  .phase-dot.blue  { border-color: var(--accent2); box-shadow: 0 0 12px rgba(0,212,255,0.4); }
+  .phase-dot.purple { border-color: var(--accent3); box-shadow: 0 0 12px rgba(168,85,247,0.4); }
+  .phase-dot.green { border-color: var(--green); box-shadow: 0 0 12px rgba(16,185,129,0.4); }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .phase-tag {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 2px;
+    background: rgba(255,107,53,0.15);
+    color: var(--accent);
+    border: 1px solid rgba(255,107,53,0.3);
+  }
+
+  .phase-tag.blue { background: rgba(0,212,255,0.1); color: var(--accent2); border-color: rgba(0,212,255,0.3); }
+  .phase-tag.purple { background: rgba(168,85,247,0.1); color: var(--accent3); border-color: rgba(168,85,247,0.3); }
+  .phase-tag.green { background: rgba(16,185,129,0.1); color: var(--green); border-color: rgba(16,185,129,0.3); }
+
+  .phase h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .phase-body {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+  }
+
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .topic-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 12px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .topic-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+  .topic-card .icon { font-size: 18px; margin-bottom: 6px; display: block; }
+  .topic-card .name { font-weight: 500; color: var(--text); }
+  .topic-card .sub  { color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+  /* QUESTIONS */
+  .q-filter {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  .filter-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    background: rgba(255,107,53,0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .q-grid { display: grid; gap: 16px; }
+
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .q-card:hover { border-color: var(--accent2); }
+
+  .q-card.hidden { display: none; }
+
+  .q-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .q-num { color: var(--muted); font-size: 11px; }
+
+  .q-level {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .q-level.easy   { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+  .q-level.medium { background: rgba(245,158,11,0.15); color: var(--yellow); border: 1px solid rgba(245,158,11,0.3); }
+  .q-level.hard   { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+
+  .q-topic {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    background: rgba(0,212,255,0.1);
+    color: var(--accent2);
+    border: 1px solid rgba(0,212,255,0.2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .q-text { font-size: 13px; color: var(--text); margin-bottom: 10px; }
+
+  .q-answer {
+    display: none;
+    margin-top: 14px;
+    padding: 16px;
+    background: var(--surface2);
+    border-left: 3px solid var(--accent2);
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .q-answer.show { display: block; }
+
+  .q-answer pre {
+    background: #060d18;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    overflow-x: auto;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #a8d5ff;
+    white-space: pre-wrap;
+  }
+
+  .toggle-ans {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .toggle-ans:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* CSV SECTION */
+  .csv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+
+  .csv-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .csv-card:hover { border-color: var(--accent); }
+
+  .csv-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .csv-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .csv-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    background: rgba(168,85,247,0.15);
+    color: var(--accent3);
+    border: 1px solid rgba(168,85,247,0.3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .csv-preview {
+    padding: 16px 20px;
+    overflow-x: auto;
+  }
+
+  .csv-preview table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+
+  .csv-preview th {
+    color: var(--accent2);
+    text-align: left;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .csv-preview td {
+    color: var(--muted);
+    padding: 5px 10px;
+    border-bottom: 1px solid rgba(30,45,69,0.5);
+    white-space: nowrap;
+  }
+
+  .csv-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .csv-desc { font-size: 11px; color: var(--muted); }
+
+  .dl-btn {
+    background: rgba(255,107,53,0.15);
+    border: 1px solid rgba(255,107,53,0.4);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 6px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .dl-btn:hover { background: rgba(255,107,53,0.3); }
+
+  /* PROGRESS TRACKER */
+  .progress-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px;
+    margin-bottom: 36px;
+  }
+
+  .prog-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; }
+
+  .prog-bars { display: grid; gap: 14px; }
+
+  .prog-item { display: flex; align-items: center; gap: 16px; }
+  .prog-label { font-size: 12px; color: var(--muted); width: 160px; flex-shrink: 0; }
+  .prog-track { flex:1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+  .prog-pct { font-size: 12px; color: var(--text); width: 36px; text-align: right; }
+
+  /* CHEATSHEET */
+  .cheat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+
+  .cheat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .cheat-card h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent2);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cheat-card pre {
+    background: #060d18;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    font-size: 11px;
+    color: #a8d5ff;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    line-height: 1.7;
+  }
+
+  /* MISC */
+  .kw { color: #ff9d6a; }
+  .fn { color: #7dd3fc; }
+  .str { color: #86efac; }
+  .cm { color: #475569; font-style: italic; }
+  .num { color: #f0abfc; }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .counter-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,107,53,0.12);
+    border: 1px solid rgba(255,107,53,0.25);
+    color: var(--accent);
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+  }
+
+  .dot-live {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity:1; transform: scale(1); }
+    50% { opacity:0.5; transform: scale(1.4); }
+  }
+
+  @media (max-width: 600px) {
+    .hero-stats { gap: 24px; }
+    .stat-num { font-size: 1.8rem; }
+    .section { padding: 32px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">⚡ Complete Learning System</div>
+  <h1><span class="data">Data</span><span class="spark">bricks</span><br>Mastery Roadmap</h1>
+  <p class="hero-sub">From Zero to Certified — structured phases, 100+ practice questions, sample datasets, and PySpark cheatsheets all in one page.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">6</div><div class="stat-label">Phases</div></div>
+    <div class="stat"><div class="stat-num">110+</div><div class="stat-label">Questions</div></div>
+    <div class="stat"><div class="stat-num">8</div><div class="stat-label">CSV Datasets</div></div>
+    <div class="stat"><div class="stat-num">∞</div><div class="stat-label">Practice</div></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="showTab('roadmap')">🗺 Roadmap</button>
+  <button class="tab-btn" onclick="showTab('questions')">❓ 110+ Questions</button>
+  <button class="tab-btn" onclick="showTab('datasets')">📊 CSV Datasets</button>
+  <button class="tab-btn" onclick="showTab('cheatsheet')">📋 Cheatsheet</button>
+  <button class="tab-btn" onclick="showTab('progress')">📈 Progress</button>
+</div>
+
+<!-- ===================== ROADMAP ===================== -->
+<div id="roadmap" class="section active">
+  <div class="section-title">Learning <span>Roadmap</span></div>
+  <p class="section-desc">// 6 structured phases — follow in order for maximum retention</p>
+
+  <div class="roadmap">
+
+    <div class="phase" style="animation-delay:0.0s">
+      <div class="phase-dot"></div>
+      <div class="phase-header">
+        <span class="phase-tag">Phase 1 · Week 1-2</span>
+        <h3>Foundations & Setup</h3>
+      </div>
+      <div class="phase-body">
+        <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">Get your environment ready and understand what Databricks is before writing a single line of code.</p>
+        <div class="topic-grid">
+          <div class="topic-card"><span class="icon">☁️</span><span class="name">What is Databricks?</span><span class="sub">Lakehouse architecture, Delta Lake</span></div>
+          <div class="topic-card"><span class="icon">⚙️</span><span class="name">Workspace Setup</span><span class="sub">Community Edition / Azure / AWS</span></div>
+          <div class="topic-card"><span class="icon">🐍</span><span class="name">Python Refresher</span><span class="sub">Functions, loops, list comprehensions</span></div>
+          <div class="topic-card"><span class="icon">📓</span><span class="name">Notebooks</span><span class="sub">Magic commands, cell types, widgets</span></div>
+          <div class="topic-card"><span class="icon">🔧</span><span class="name">Clusters</span><span class="sub">Single node vs multi node, runtime</span></div>
+          <div class="topic-card"><span class="icon">📁</span><span class="name">DBFS</span><span class="sub">File system basics, mount points</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase" style="animation-delay:0.1s">
+      <div class="phase-dot blue"></div>
+      <div class="phase-header">
+        <span class="phase-tag blue">Phase 2 · Week 3-4</span>
+        <h3>PySpark Core</h3>
+      </div>
+      <div class="phase-body">
+        <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">Master the DataFrame API — the backbone of everything in Databricks.</p>
+        <div class="topic-grid">
+          <div class="topic-card"><span class="icon">🔥</span><span class="name">SparkSession</span><span class="sub">Entry point, configs</span></div>
+          <div class="topic-card"><span class="icon">📊</span><span class="name">DataFrames</span><span class="sub">Create, read CSV/JSON/Parquet</span></div>
+          <div class="topic-card"><span class="icon">🔍</span><span class="name">Transformations</span><span class="sub">select, filter, where, withColumn</span></div>
+          <div class="topic-card"><span class="icon">🔗</span><span class="name">Joins</span><span class="sub">inner, left, right, full, cross</span></div>
+          <div class="topic-card"><span class="icon">📦</span><span class="name">Aggregations</span><span class="sub">groupBy, agg, count, sum, avg</span></div>
+          <div class="topic-card"><span class="icon">🪟</span><span class="name">Window Functions</span><span class="sub">rank, dense_rank, row_number, lag</span></div>
+          <div class="topic-card"><span class="icon">🧹</span><span class="name">Data Cleaning</span><span class="sub">null handling, dropDuplicates, cast</span></div>
+          <div class="topic-card"><span class="icon">🔤</span><span class="name">String Functions</span><span class="sub">split, upper, lower, regexp_replace</span></div>
+          <div class="topic-card"><span class="icon">📅</span><span class="name">Date Functions</span><span class="sub">to_date, date_add, datediff, trunc</span></div>
+          <div class="topic-card"><span class="icon">💾</span><span class="name">Writing Data</span><span class="sub">write modes, partitionBy, format</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase" style="animation-delay:0.2s">
+      <div class="phase-dot purple"></div>
+      <div class="phase-header">
+        <span class="phase-tag purple">Phase 3 · Week 5-6</span>
+        <h3>Delta Lake & SQL</h3>
+      </div>
+      <div class="phase-body">
+        <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">Delta Lake is what makes Databricks unique. Master ACID transactions and time travel.</p>
+        <div class="topic-grid">
+          <div class="topic-card"><span class="icon">△</span><span class="name">Delta Tables</span><span class="sub">Create, insert, update, delete</span></div>
+          <div class="topic-card"><span class="icon">⏰</span><span class="name">Time Travel</span><span class="sub">VERSION AS OF, TIMESTAMP AS OF</span></div>
+          <div class="topic-card"><span class="icon">🔀</span><span class="name">MERGE INTO</span><span class="sub">Upserts, SCD Type 1/2</span></div>
+          <div class="topic-card"><span class="icon">📜</span><span class="name">Transaction Log</span><span class="sub">_delta_log, DESCRIBE HISTORY</span></div>
+          <div class="topic-card"><span class="icon">⚡</span><span class="name">Optimize & ZORDER</span><span class="sub">File compaction, data skipping</span></div>
+          <div class="topic-card"><span class="icon">🧽</span><span class="name">VACUUM</span><span class="sub">Cleaning old files, retention</span></div>
+          <div class="topic-card"><span class="icon">🗄️</span><span class="name">Spark SQL</span><span class="sub">DDL, DML, views, temp views</span></div>
+          <div class="topic-card"><span class="icon">🏗️</span><span class="name">Hive Metastore</span><span class="sub">Databases, schemas, Unity Catalog</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase" style="animation-delay:0.3s">
+      <div class="phase-dot green"></div>
+      <div class="phase-header">
+        <span class="phase-tag green">Phase 4 · Week 7-8</span>
+        <h3>Advanced Transformations</h3>
+      </div>
+      <div class="phase-body">
+        <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">Go beyond basics — complex use cases found in real data engineering interviews.</p>
+        <div class="topic-grid">
+          <div class="topic-card"><span class="icon">🗺️</span><span class="name">UDFs</span><span class="sub">User Defined Functions, pandas_udf</span></div>
+          <div class="topic-card"><span class="icon">📐</span><span class="name">Schema Evolution</span><span class="sub">mergeSchema, overwriteSchema</span></div>
+          <div class="topic-card"><span class="icon">🔲</span><span class="name">Struct & Array</span><span class="sub">explode, flatten, struct, map_from</span></div>
+          <div class="topic-card"><span class="icon">🌊</span><span class="name">Streaming</span><span class="sub">readStream, writeStream, triggers</span></div>
+          <div class="topic-card"><span class="icon">🔄</span><span class="name">Auto Loader</span><span class="sub">cloudFiles, schema inference</span></div>
+          <div class="topic-card"><span class="icon">📡</span><span class="name">Broadcast Joins</span><span class="sub">broadcast hint, skew handling</span></div>
+          <div class="topic-card"><span class="icon">🧊</span><span class="name">Caching</span><span class="sub">cache(), persist(), unpersist()</span></div>
+          <div class="topic-card"><span class="icon">📈</span><span class="name">Medallion Architecture</span><span class="sub">Bronze → Silver → Gold layers</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase" style="animation-delay:0.4s">
+      <div class="phase-dot"></div>
+      <div class="phase-header">
+        <span class="phase-tag">Phase 5 · Week 9-10</span>
+        <h3>Workflows & Orchestration</h3>
+      </div>
+      <div class="phase-body">
+        <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">Build production pipelines with Jobs, task dependencies, and monitoring.</p>
+        <div class="topic-grid">
+          <div class="topic-card"><span class="icon">⚙️</span><span class="name">Databricks Jobs</span><span class="sub">Scheduled tasks, triggers</span></div>
+          <div class="topic-card"><span class="icon">🔗</span><span class="name">Task Dependencies</span><span class="sub">DAGs, parallel vs sequential</span></div>
+          <div class="topic-card"><span class="icon">📦</span><span class="name">DLT Pipelines</span><span class="sub">Delta Live Tables, expectations</span></div>
+          <div class="topic-card"><span class="icon">🚨</span><span class="name">Alerts & Monitoring</span><span class="sub">Email, Slack, webhooks</span></div>
+          <div class="topic-card"><span class="icon">🐞</span><span class="name">Debugging</span><span class="sub">Spark UI, DAG visualization</span></div>
+          <div class="topic-card"><span class="icon">🔐</span><span class="name">Secrets & Configs</span><span class="sub">Secret scopes, key vault</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase" style="animation-delay:0.5s">
+      <div class="phase-dot blue"></div>
+      <div class="phase-header">
+        <span class="phase-tag blue">Phase 6 · Week 11-12</span>
+        <h3>Certification Prep</h3>
+      </div>
+      <div class="phase-body">
+        <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">Practice exams, mock interviews, and real-world capstone project to consolidate everything.</p>
+        <div class="topic-grid">
+          <div class="topic-card"><span class="icon">🎯</span><span class="name">DE Associate Exam</span><span class="sub">60 questions, 90 minutes</span></div>
+          <div class="topic-card"><span class="icon">🏆</span><span class="name">Capstone Project</span><span class="sub">End-to-end pipeline with Delta</span></div>
+          <div class="topic-card"><span class="icon">📝</span><span class="name">Mock Tests</span><span class="sub">Timed practice sets</span></div>
+          <div class="topic-card"><span class="icon">🗣️</span><span class="name">Interview Prep</span><span class="sub">Scenario questions, system design</span></div>
+          <div class="topic-card"><span class="icon">☁️</span><span class="name">Cloud Integration</span><span class="sub">S3, ADLS, GCS, IAM</span></div>
+          <div class="topic-card"><span class="icon">🔧</span><span class="name">Performance Tuning</span><span class="sub">Adaptive query, AQE, partitions</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== QUESTIONS ===================== -->
+<div id="questions" class="section">
+  <div class="section-title">110+ Practice <span>Questions</span></div>
+  <p class="section-desc">// Click any question to reveal the answer · Filter by topic or difficulty</p>
+
+  <div class="counter-badge"><div class="dot-live"></div> <span id="q-count">110 Questions</span> loaded</div>
+
+  <div class="q-filter">
+    <button class="filter-btn active" onclick="filterQ('all', this)">All</button>
+    <button class="filter-btn" onclick="filterQ('basics', this)">Basics</button>
+    <button class="filter-btn" onclick="filterQ('transformations', this)">Transformations</button>
+    <button class="filter-btn" onclick="filterQ('aggregations', this)">Aggregations</button>
+    <button class="filter-btn" onclick="filterQ('joins', this)">Joins</button>
+    <button class="filter-btn" onclick="filterQ('window', this)">Window Fns</button>
+    <button class="filter-btn" onclick="filterQ('delta', this)">Delta Lake</button>
+    <button class="filter-btn" onclick="filterQ('sql', this)">Spark SQL</button>
+    <button class="filter-btn" onclick="filterQ('streaming', this)">Streaming</button>
+    <button class="filter-btn" onclick="filterQ('performance', this)">Performance</button>
+    <button class="filter-btn" onclick="filterQ('easy', this)">🟢 Easy</button>
+    <button class="filter-btn" onclick="filterQ('medium', this)">🟡 Medium</button>
+    <button class="filter-btn" onclick="filterQ('hard', this)">🔴 Hard</button>
+  </div>
+
+  <div class="q-grid" id="q-grid">
+  <!-- Questions injected by JS -->
+  </div>
+</div>
+
+<!-- ===================== DATASETS ===================== -->
+<div id="datasets" class="section">
+  <div class="section-title">Sample <span>CSV Datasets</span></div>
+  <p class="section-desc">// Click "Download CSV" to save any dataset and upload to Databricks DBFS</p>
+
+  <div class="csv-grid" id="csv-grid">
+  <!-- Rendered by JS -->
+  </div>
+</div>
+
+<!-- ===================== CHEATSHEET ===================== -->
+<div id="cheatsheet" class="section">
+  <div class="section-title">PySpark <span>Cheatsheet</span></div>
+  <p class="section-desc">// Quick-reference code snippets for the most common patterns</p>
+
+  <div class="cheat-grid" id="cheat-grid">
+  <!-- Rendered by JS -->
+  </div>
+</div>
+
+<!-- ===================== PROGRESS ===================== -->
+<div id="progress" class="section">
+  <div class="section-title">My <span>Progress</span></div>
+  <p class="section-desc">// Track how many questions you've attempted per topic</p>
+
+  <div class="progress-wrap">
+    <div class="prog-title">📊 Topic Completion</div>
+    <div class="prog-bars" id="prog-bars">
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="prog-title">🏅 Questions Answered Today</div>
+    <p style="font-size:13px; color:var(--muted); margin-top:8px;">Answers revealed: <span id="answered-count" style="color:var(--accent2); font-size:1.4rem; font-family:'Syne',sans-serif; font-weight:700;">0</span> / 110</p>
+    <div style="height:8px; background:var(--surface2); border-radius:4px; margin-top:16px; overflow:hidden;">
+      <div id="overall-bar" style="height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:4px; transition:width 0.5s ease;"></div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ===== DATA =====
+const questions = [
+  // BASICS
+  {id:1, topic:'basics', level:'easy', q:'What is Apache Spark and how does Databricks extend it?', a:'Apache Spark is an open-source distributed computing engine for big data processing. Databricks extends Spark by providing a managed cloud platform with Delta Lake, collaborative notebooks, workflows, and Unity Catalog on top of Spark.',code:''},
+  {id:2, topic:'basics', level:'easy', q:'What is DBFS (Databricks File System)?', a:'DBFS is an abstraction layer on top of cloud object storage (S3, ADLS, GCS). It lets you use familiar file system paths like /dbfs/ or dbfs:/ to access cloud storage from notebooks and jobs.',code:'# List files in DBFS\ndbutils.fs.ls("dbfs:/FileStore/")'},
+  {id:3, topic:'basics', level:'easy', q:'How do you create a SparkSession in PySpark?', a:'In Databricks, SparkSession is pre-created as `spark`. In standalone PySpark:',code:'from pyspark.sql import SparkSession\nspark = SparkSession.builder.appName("MyApp").getOrCreate()'},
+  {id:4, topic:'basics', level:'easy', q:'What is the difference between a transformation and an action in Spark?', a:'Transformations (map, filter, select) are lazy — they build a DAG but do not execute. Actions (collect, count, show, write) trigger execution. This lazy evaluation allows Spark to optimize the full query plan before running.',code:''},
+  {id:5, topic:'basics', level:'easy', q:'What are the different cluster modes in Databricks?', a:'1. Single Node — driver only, no workers, good for small data/ML. 2. Multi Node — driver + multiple worker nodes. 3. Job Clusters — auto-created for a job and terminated after. 4. All-Purpose Clusters — interactive, shared.',code:''},
+  {id:6, topic:'basics', level:'easy', q:'How do you read a CSV file into a Spark DataFrame?', a:'',code:'df = spark.read.format("csv")\\\n    .option("header", "true")\\\n    .option("inferSchema", "true")\\\n    .load("dbfs:/FileStore/sales.csv")\ndf.show(5)'},
+  {id:7, topic:'basics', level:'easy', q:'What does inferSchema do and what is the alternative?', a:'inferSchema=True makes Spark scan the data to detect column types (costs an extra pass). The alternative is to define a schema manually using StructType/StructField, which is faster and safer for production.',code:'from pyspark.sql.types import StructType, StructField, StringType, IntegerType\nschema = StructType([\n    StructField("id", IntegerType(), True),\n    StructField("name", StringType(), True)\n])\ndf = spark.read.schema(schema).csv("dbfs:/data.csv", header=True)'},
+  {id:8, topic:'basics', level:'medium', q:'What is a Databricks Widget and how do you use it?', a:'Widgets are input controls in notebooks to make them parameterizable. They allow you to pass values when running notebooks as jobs.',code:'dbutils.widgets.text("city", "Hyderabad", "Enter City")\ncity = dbutils.widgets.get("city")\nprint(city)'},
+
+  // TRANSFORMATIONS
+  {id:9, topic:'transformations', level:'easy', q:'How do you select specific columns from a DataFrame?', a:'',code:'df.select("name", "salary").show()\n# Or using col()\nfrom pyspark.sql.functions import col\ndf.select(col("name"), col("salary") * 1.1).show()'},
+  {id:10, topic:'transformations', level:'easy', q:'How do you filter rows where salary > 50000?', a:'',code:'df.filter(col("salary") > 50000).show()\n# Equivalent:\ndf.where("salary > 50000").show()'},
+  {id:11, topic:'transformations', level:'easy', q:'How do you add a new column to a DataFrame?', a:'',code:'from pyspark.sql.functions import col, lit\ndf = df.withColumn("tax", col("salary") * 0.2)\ndf = df.withColumn("country", lit("India"))'},
+  {id:12, topic:'transformations', level:'easy', q:'How do you rename a column?', a:'',code:'df = df.withColumnRenamed("emp_name", "employee_name")\n# Or in select:\ndf.select(col("emp_name").alias("employee_name"))'},
+  {id:13, topic:'transformations', level:'easy', q:'How do you drop a column from a DataFrame?', a:'',code:'df = df.drop("temp_col")\n# Drop multiple:\ndf = df.drop("col1", "col2")'},
+  {id:14, topic:'transformations', level:'easy', q:'How do you remove duplicate rows?', a:'',code:'# All columns\ndf.dropDuplicates().show()\n# Based on subset:\ndf.dropDuplicates(["email"]).show()'},
+  {id:15, topic:'transformations', level:'easy', q:'How do you sort a DataFrame?', a:'',code:'df.orderBy("salary").show()  # asc\ndf.orderBy(col("salary").desc()).show()  # desc\ndf.sort("dept", col("salary").desc()).show()'},
+  {id:16, topic:'transformations', level:'easy', q:'How do you handle null values in a DataFrame?', a:'',code:'# Drop rows with any null\ndf.dropna().show()\n# Fill nulls\ndf.fillna({"salary": 0, "city": "Unknown"}).show()\n# Filter nulls\ndf.filter(col("salary").isNull()).show()'},
+  {id:17, topic:'transformations', level:'medium', q:'How do you apply a CASE WHEN equivalent in PySpark?', a:'',code:'from pyspark.sql.functions import when\ndf = df.withColumn("grade",\n    when(col("score") >= 90, "A")\n    .when(col("score") >= 75, "B")\n    .when(col("score") >= 60, "C")\n    .otherwise("F"))'},
+  {id:18, topic:'transformations', level:'medium', q:'How do you split a full_name column into first_name and last_name?', a:'',code:'from pyspark.sql.functions import split\ndf = df.withColumn("first_name", split(col("full_name"), " ")[0])\ndf = df.withColumn("last_name", split(col("full_name"), " ")[1])'},
+  {id:19, topic:'transformations', level:'medium', q:'How do you apply upper/lower case on a string column?', a:'',code:'from pyspark.sql.functions import upper, lower, initcap\ndf.withColumn("name_upper", upper(col("name")))\ndf.withColumn("email_lower", lower(col("email")))'},
+  {id:20, topic:'transformations', level:'medium', q:'How do you cast a column to a different data type?', a:'',code:'df = df.withColumn("age", col("age").cast("integer"))\ndf = df.withColumn("salary", col("salary").cast("double"))\n# Or using DataTypes\nfrom pyspark.sql.types import IntegerType\ndf = df.withColumn("age", col("age").cast(IntegerType()))'},
+  {id:21, topic:'transformations', level:'medium', q:'How do you pivot a DataFrame (rows to columns)?', a:'',code:'pivot_df = df.groupBy("dept")\\\n    .pivot("quarter")\\\n    .agg({"sales": "sum"})\npivot_df.show()'},
+  {id:22, topic:'transformations', level:'medium', q:'How do you explode an array column into separate rows?', a:'',code:'from pyspark.sql.functions import explode\n# If "skills" column has arrays like ["Python", "SQL"]\ndf.withColumn("skill", explode(col("skills"))).show()'},
+  {id:23, topic:'transformations', level:'medium', q:'How do you replace values using regexp_replace?', a:'',code:'from pyspark.sql.functions import regexp_replace\ndf = df.withColumn("phone",\n    regexp_replace(col("phone"), "[^0-9]", ""))'},
+  {id:24, topic:'transformations', level:'hard', q:'How do you unpivot (melt) a DataFrame in PySpark?', a:'PySpark does not have a built-in melt. Use the stack() SQL function via selectExpr.',code:'df.selectExpr(\n    "id",\n    "stack(3, \'Q1\', Q1, \'Q2\', Q2, \'Q3\', Q3) as (quarter, sales)"\n).show()'},
+  {id:25, topic:'transformations', level:'hard', q:'How do you flatten a nested struct column?', a:'',code:'from pyspark.sql.functions import col\n# If address is struct with city/state\ndf.select(\n    col("name"),\n    col("address.city").alias("city"),\n    col("address.state").alias("state")\n).show()'},
+
+  // AGGREGATIONS
+  {id:26, topic:'aggregations', level:'easy', q:'How do you count rows in a DataFrame?', a:'',code:'print(df.count())\n# With groupBy:\ndf.groupBy("dept").count().show()'},
+  {id:27, topic:'aggregations', level:'easy', q:'How do you calculate sum, avg, min, max?', a:'',code:'from pyspark.sql.functions import sum, avg, min, max, count\ndf.agg(\n    sum("salary").alias("total_salary"),\n    avg("salary").alias("avg_salary"),\n    min("salary").alias("min_salary"),\n    max("salary").alias("max_salary")\n).show()'},
+  {id:28, topic:'aggregations', level:'easy', q:'How do you group by department and calculate average salary?', a:'',code:'df.groupBy("dept")\\\n  .agg(avg("salary").alias("avg_salary"),\n       count("*").alias("emp_count"))\\\n  .show()'},
+  {id:29, topic:'aggregations', level:'medium', q:'How do you find the department with the highest total salary?', a:'',code:'df.groupBy("dept")\\\n  .agg(sum("salary").alias("total"))\\\n  .orderBy(col("total").desc())\\\n  .limit(1)\\\n  .show()'},
+  {id:30, topic:'aggregations', level:'medium', q:'How do you find employees earning more than the average salary in their department?', a:'',code:'from pyspark.sql.functions import avg\nfrom pyspark.sql import Window\n\nwindow = Window.partitionBy("dept")\ndf.withColumn("dept_avg", avg("salary").over(window))\\\n  .filter(col("salary") > col("dept_avg"))\\\n  .show()'},
+  {id:31, topic:'aggregations', level:'medium', q:'How do you collect list of values per group?', a:'',code:'from pyspark.sql.functions import collect_list, collect_set\ndf.groupBy("dept")\\\n  .agg(collect_list("name").alias("employees"),\n       collect_set("city").alias("cities"))\\\n  .show(truncate=False)'},
+  {id:32, topic:'aggregations', level:'medium', q:'How do you use countDistinct?', a:'',code:'from pyspark.sql.functions import countDistinct\ndf.agg(countDistinct("city").alias("unique_cities")).show()'},
+  {id:33, topic:'aggregations', level:'hard', q:'Find the top 2 earners per department using PySpark.', a:'Use Window with rank or dense_rank, then filter.',code:'from pyspark.sql.functions import dense_rank\nfrom pyspark.sql import Window\n\nw = Window.partitionBy("dept").orderBy(col("salary").desc())\ndf.withColumn("rank", dense_rank().over(w))\\\n  .filter(col("rank") <= 2)\\\n  .show()'},
+  {id:34, topic:'aggregations', level:'hard', q:'How do you calculate a running total (cumulative sum)?', a:'',code:'from pyspark.sql.functions import sum\nfrom pyspark.sql import Window\n\nw = Window.partitionBy("dept").orderBy("date")\\\n    .rowsBetween(Window.unboundedPreceding, Window.currentRow)\ndf.withColumn("running_total", sum("amount").over(w)).show()'},
+  {id:35, topic:'aggregations', level:'hard', q:'How do you compute percentile/quantile of a column?', a:'',code:'from pyspark.sql.functions import percentile_approx\ndf.agg(\n    percentile_approx("salary", 0.5).alias("median"),\n    percentile_approx("salary", 0.9).alias("p90")\n).show()'},
+
+  // JOINS
+  {id:36, topic:'joins', level:'easy', q:'What are the types of joins in PySpark?', a:'inner, left (left_outer), right (right_outer), full (outer / full_outer), left_semi, left_anti, cross. left_semi returns only rows from left that match right. left_anti returns only rows from left that do NOT match right.',code:''},
+  {id:37, topic:'joins', level:'easy', q:'How do you perform an inner join on two DataFrames?', a:'',code:'result = emp_df.join(dept_df, on="dept_id", how="inner")\nresult.show()'},
+  {id:38, topic:'joins', level:'easy', q:'How do you join on multiple columns?', a:'',code:'result = df1.join(df2,\n    (df1.emp_id == df2.id) & (df1.dept == df2.dept_code),\n    how="left")'},
+  {id:39, topic:'joins', level:'medium', q:'How do you handle column ambiguity after a join?', a:'When both DataFrames have columns with the same name, use aliases.',code:'emp = emp_df.alias("e")\ndept = dept_df.alias("d")\nresult = emp.join(dept, col("e.dept_id") == col("d.id"))\\\n    .select(col("e.name"), col("d.dept_name"))'},
+  {id:40, topic:'joins', level:'medium', q:'What is a broadcast join and when should you use it?', a:'Broadcast join copies the smaller DataFrame to all worker nodes, avoiding shuffle. Use when one DataFrame is small enough to fit in memory (default threshold: 10MB, tunable).',code:'from pyspark.sql.functions import broadcast\nresult = large_df.join(broadcast(small_df), "key")'},
+  {id:41, topic:'joins', level:'medium', q:'How do you find records in table A that have no match in table B?', a:'',code:'# Using left_anti\nresult = df_a.join(df_b, df_a.id == df_b.id, how="left_anti")\nresult.show()'},
+  {id:42, topic:'joins', level:'medium', q:'How do you perform a self join?', a:'',code:'emp = df.alias("e")\nmgr = df.alias("m")\nresult = emp.join(mgr, col("e.manager_id") == col("m.emp_id"))\\\n    .select(col("e.name").alias("employee"),\n            col("m.name").alias("manager"))'},
+  {id:43, topic:'joins', level:'hard', q:'How do you handle a skewed join (one key has much more data than others)?', a:'Use salting: add a random salt suffix to the join keys so one large partition splits across many. Or use the skew hint AQE in Spark 3+.',code:'# Enable AQE (handles skew automatically in Spark 3)\nspark.conf.set("spark.sql.adaptive.enabled", "true")\nspark.conf.set("spark.sql.adaptive.skewJoin.enabled", "true")'},
+
+  // WINDOW FUNCTIONS
+  {id:44, topic:'window', level:'easy', q:'What is a Window function in PySpark?', a:'Window functions compute a result across a set of rows related to the current row — like SQL window functions. They use WindowSpec defined with partitionBy and/or orderBy. Common ones: row_number, rank, dense_rank, lag, lead, sum, avg.',code:''},
+  {id:45, topic:'window', level:'easy', q:'How do you assign row numbers within each department ordered by salary?', a:'',code:'from pyspark.sql.functions import row_number\nfrom pyspark.sql import Window\n\nw = Window.partitionBy("dept").orderBy(col("salary").desc())\ndf.withColumn("row_num", row_number().over(w)).show()'},
+  {id:46, topic:'window', level:'medium', q:'What is the difference between rank() and dense_rank()?', a:'rank() leaves gaps after ties (1,1,3). dense_rank() does not leave gaps (1,1,2). Use dense_rank when you want "Nth highest" without skipping positions.',code:'from pyspark.sql.functions import rank, dense_rank\nw = Window.partitionBy("dept").orderBy(col("salary").desc())\ndf.withColumn("rank", rank().over(w))\\\n  .withColumn("dense_rank", dense_rank().over(w)).show()'},
+  {id:47, topic:'window', level:'medium', q:'How do you get the previous row value using lag()?', a:'',code:'from pyspark.sql.functions import lag\nw = Window.partitionBy("emp_id").orderBy("date")\ndf.withColumn("prev_sales", lag("sales", 1).over(w)).show()'},
+  {id:48, topic:'window', level:'medium', q:'How do you get the next row value using lead()?', a:'',code:'from pyspark.sql.functions import lead\nw = Window.partitionBy("emp_id").orderBy("date")\ndf.withColumn("next_sales", lead("sales", 1).over(w)).show()'},
+  {id:49, topic:'window', level:'medium', q:'How do you calculate the difference between current and previous month sales?', a:'',code:'from pyspark.sql.functions import lag\nw = Window.partitionBy("region").orderBy("month")\ndf = df.withColumn("prev_sales", lag("sales", 1).over(w))\ndf = df.withColumn("growth", col("sales") - col("prev_sales"))'},
+  {id:50, topic:'window', level:'hard', q:'How do you find the first and last value in a window?', a:'',code:'from pyspark.sql.functions import first, last\nw = Window.partitionBy("dept").orderBy("date")\\\n    .rowsBetween(Window.unboundedPreceding, Window.unboundedFollowing)\ndf.withColumn("first_val", first("sales").over(w))\\\n  .withColumn("last_val", last("sales").over(w)).show()'},
+  {id:51, topic:'window', level:'hard', q:'How do you compute a 3-period moving average?', a:'',code:'from pyspark.sql.functions import avg\nw = Window.partitionBy("region").orderBy("month")\\\n    .rowsBetween(-2, 0)  # 2 rows before + current\ndf.withColumn("moving_avg_3", avg("sales").over(w)).show()'},
+
+  // DELTA LAKE
+  {id:52, topic:'delta', level:'easy', q:'What is Delta Lake and what problems does it solve?', a:'Delta Lake adds ACID transactions, schema enforcement, time travel, and scalable metadata management on top of Parquet files in cloud storage. It solves consistency, corruption, and schema drift issues common in data lakes.',code:''},
+  {id:53, topic:'delta', level:'easy', q:'How do you create a Delta table?', a:'',code:'# Write DataFrame as Delta\ndf.write.format("delta").save("/delta/employees")\n\n# Create using SQL\nspark.sql("""\n  CREATE TABLE employees\n  USING DELTA\n  AS SELECT * FROM csv.`/data/emp.csv`\n""")'},
+  {id:54, topic:'delta', level:'easy', q:'What are the 4 write modes in Spark?', a:'1. overwrite — replace existing data. 2. append — add to existing. 3. ignore — skip if exists. 4. error/errorIfExists — throw error if exists (default).',code:'df.write.format("delta").mode("overwrite").save("/delta/emp")'},
+  {id:55, topic:'delta', level:'easy', q:'How do you read a Delta table and its history?', a:'',code:'df = spark.read.format("delta").load("/delta/employees")\n# History\nspark.sql("DESCRIBE HISTORY delta.`/delta/employees`").show()'},
+  {id:56, topic:'delta', level:'medium', q:'How does Delta Lake time travel work?', a:'Delta keeps a transaction log (_delta_log) with every change. You can query older versions using VERSION AS OF or TIMESTAMP AS OF.',code:'# By version number\ndf = spark.read.format("delta")\\\n    .option("versionAsOf", 3)\\\n    .load("/delta/employees")\n\n# By timestamp\ndf = spark.read.format("delta")\\\n    .option("timestampAsOf", "2024-01-15")\\\n    .load("/delta/employees")'},
+  {id:57, topic:'delta', level:'medium', q:'How do you perform a MERGE (upsert) in Delta Lake?', a:'MERGE INTO is like SQL UPSERT — update if exists, insert if new.',code:'spark.sql("""\n  MERGE INTO target t\n  USING source s\n  ON t.id = s.id\n  WHEN MATCHED THEN\n    UPDATE SET t.salary = s.salary, t.dept = s.dept\n  WHEN NOT MATCHED THEN\n    INSERT (id, name, salary, dept)\n    VALUES (s.id, s.name, s.salary, s.dept)\n""")'},
+  {id:58, topic:'delta', level:'medium', q:'What is OPTIMIZE and ZORDER in Delta Lake?', a:'OPTIMIZE compacts small files into larger ones (better read performance). ZORDER co-locates related data in the same files based on a column — ideal for filter columns.',code:'spark.sql("OPTIMIZE employees ZORDER BY (dept, city)")'},
+  {id:59, topic:'delta', level:'medium', q:'What does VACUUM do in Delta Lake?', a:'VACUUM removes old data files no longer referenced by the transaction log. Default retention is 7 days. Vacuuming within the retention period breaks time travel.',code:'spark.sql("VACUUM employees RETAIN 168 HOURS")  # 7 days\n# Override (careful!)\nspark.sql("SET spark.databricks.delta.retentionDurationCheck.enabled = false")\nspark.sql("VACUUM employees RETAIN 0 HOURS")'},
+  {id:60, topic:'delta', level:'hard', q:'How do you implement SCD Type 2 using Delta MERGE?', a:'',code:'spark.sql("""\n  MERGE INTO dim_customer t\n  USING new_data s ON t.id = s.id AND t.is_current = true\n  WHEN MATCHED AND (t.city <> s.city OR t.email <> s.email) THEN\n    UPDATE SET t.is_current = false, t.end_date = current_date()\n  WHEN NOT MATCHED THEN\n    INSERT (id, name, city, email, start_date, end_date, is_current)\n    VALUES (s.id, s.name, s.city, s.email, current_date(), null, true)\n""")'},
+  {id:61, topic:'delta', level:'hard', q:'What is schema evolution in Delta Lake?', a:'Schema evolution allows adding new columns without rewriting the table.',code:'# Allow schema merge on write\ndf.write.format("delta")\\\n    .option("mergeSchema", "true")\\\n    .mode("append")\\\n    .save("/delta/employees")\n\n# Overwrite schema entirely\ndf.write.format("delta")\\\n    .option("overwriteSchema", "true")\\\n    .mode("overwrite")\\\n    .save("/delta/employees")'},
+  {id:62, topic:'delta', level:'medium', q:'What is the Medallion Architecture?', a:'Bronze (raw ingested data, no transformation), Silver (cleaned, deduped, joined data), Gold (aggregated, business-ready data). Each layer builds on the previous one using Delta tables.',code:''},
+  {id:63, topic:'delta', level:'medium', q:'How do you use Delta Lake change data feed (CDF)?', a:'',code:'# Enable CDF\nspark.sql("ALTER TABLE employees SET TBLPROPERTIES (delta.enableChangeDataFeed = true)")\n\n# Read changes\ndf = spark.read.format("delta")\\\n    .option("readChangeFeed", "true")\\\n    .option("startingVersion", 1)\\\n    .table("employees")'},
+
+  // SPARK SQL
+  {id:64, topic:'sql', level:'easy', q:'How do you run SQL queries on a DataFrame?', a:'',code:'df.createOrReplaceTempView("employees")\nresult = spark.sql("SELECT dept, AVG(salary) as avg_sal FROM employees GROUP BY dept")\nresult.show()'},
+  {id:65, topic:'sql', level:'easy', q:'What is the difference between a temp view and a global temp view?', a:'Temp view is session-scoped — only available in the current SparkSession. Global temp view is accessible across sessions, stored in global_temp database. Both are in-memory and not persisted.',code:'df.createOrReplaceGlobalTempView("global_emp")\nspark.sql("SELECT * FROM global_temp.global_emp").show()'},
+  {id:66, topic:'sql', level:'easy', q:'How do you create a permanent table in Databricks?', a:'',code:'df.write.format("delta").saveAsTable("default.employees")\n# Or SQL:\nspark.sql("CREATE TABLE IF NOT EXISTS employees USING DELTA AS SELECT * FROM emp_view")'},
+  {id:67, topic:'sql', level:'medium', q:'How do you use CTEs (Common Table Expressions) in Spark SQL?', a:'',code:'spark.sql("""\n  WITH dept_avg AS (\n    SELECT dept, AVG(salary) as avg_sal\n    FROM employees\n    GROUP BY dept\n  )\n  SELECT e.name, e.salary, d.avg_sal\n  FROM employees e\n  JOIN dept_avg d ON e.dept = d.dept\n  WHERE e.salary > d.avg_sal\n""").show()'},
+  {id:68, topic:'sql', level:'medium', q:'How do you use WINDOW functions in Spark SQL?', a:'',code:'spark.sql("""\n  SELECT name, dept, salary,\n    RANK() OVER (PARTITION BY dept ORDER BY salary DESC) as rnk,\n    SUM(salary) OVER (PARTITION BY dept) as dept_total\n  FROM employees\n""").show()'},
+  {id:69, topic:'sql', level:'medium', q:'How do you find the Nth highest salary using SQL?', a:'',code:'spark.sql("""\n  SELECT salary\n  FROM (\n    SELECT salary, DENSE_RANK() OVER (ORDER BY salary DESC) as rnk\n    FROM employees\n  )\n  WHERE rnk = 3\n""").show()  -- 3rd highest'},
+  {id:70, topic:'sql', level:'medium', q:'How do you pivot using Spark SQL?', a:'',code:'spark.sql("""\n  SELECT *\n  FROM (SELECT dept, quarter, sales FROM revenue)\n  PIVOT (\n    SUM(sales)\n    FOR quarter IN (\'Q1\', \'Q2\', \'Q3\', \'Q4\')\n  )\n""").show()'},
+  {id:71, topic:'sql', level:'hard', q:'How do you find duplicate rows using SQL?', a:'',code:'spark.sql("""\n  SELECT *, COUNT(*) OVER (PARTITION BY email) as cnt\n  FROM employees\n  HAVING cnt > 1\n""").show()\n-- Or:\nspark.sql("""\n  SELECT email, COUNT(*) as cnt\n  FROM employees\n  GROUP BY email\n  HAVING cnt > 1\n""")'},
+  {id:72, topic:'sql', level:'hard', q:'How do you delete duplicates keeping only the first occurrence?', a:'',code:'spark.sql("""\n  WITH ranked AS (\n    SELECT *, ROW_NUMBER() OVER (PARTITION BY email ORDER BY created_at) as rn\n    FROM employees\n  )\n  DELETE FROM employees\n  WHERE id IN (\n    SELECT id FROM ranked WHERE rn > 1\n  )\n""")'},
+
+  // STREAMING
+  {id:73, topic:'streaming', level:'easy', q:'What is Structured Streaming in Databricks?', a:'Structured Streaming is a scalable, fault-tolerant stream processing engine built on Spark SQL. It treats a data stream as an unbounded table you continuously append to. Works with Kafka, Event Hubs, files, Delta tables.',code:''},
+  {id:74, topic:'streaming', level:'easy', q:'How do you read a streaming DataFrame from a directory?', a:'',code:'stream_df = spark.readStream\\\n    .format("csv")\\\n    .option("header", "true")\\\n    .schema(schema)\\\n    .load("/data/incoming/")'},
+  {id:75, topic:'streaming', level:'medium', q:'What are the output modes in Structured Streaming?', a:'1. append — only new rows added to result (default for stateless). 2. update — only changed rows. 3. complete — full result table written each time (only for aggregations).',code:''},
+  {id:76, topic:'streaming', level:'medium', q:'How do you write a streaming DataFrame to a Delta table?', a:'',code:'query = stream_df.writeStream\\\n    .format("delta")\\\n    .outputMode("append")\\\n    .option("checkpointLocation", "/delta/checkpoints/stream1")\\\n    .start("/delta/output_table")\nquery.awaitTermination()'},
+  {id:77, topic:'streaming', level:'medium', q:'What is Auto Loader in Databricks?', a:'Auto Loader (cloudFiles) efficiently ingests new files from cloud storage into Delta Lake using directory listing or file notifications. It tracks already-processed files using a checkpoint, handles schema inference and evolution.',code:'df = spark.readStream\\\n    .format("cloudFiles")\\\n    .option("cloudFiles.format", "csv")\\\n    .option("cloudFiles.schemaLocation", "/schemas/emp")\\\n    .load("/data/raw/")'},
+  {id:78, topic:'streaming', level:'hard', q:'How do you handle late arriving data with watermarks?', a:'',code:'from pyspark.sql.functions import window\nstream_df\\\n    .withWatermark("event_time", "10 minutes")\\\n    .groupBy(window(col("event_time"), "5 minutes"), col("city"))\\\n    .agg({"amount": "sum"})\\\n    .writeStream.outputMode("append").start()'},
+
+  // PERFORMANCE
+  {id:79, topic:'performance', level:'easy', q:'What is partitioning in Spark and why does it matter?', a:'Partitioning splits data into chunks distributed across workers. Too few partitions underutilize resources; too many cause overhead. Optimal: ~128-256 MB per partition. Use repartition() or coalesce() to adjust.',code:'df.repartition(8)  # Shuffle, increases or decreases\ndf.coalesce(4)    # No shuffle, only decreases'},
+  {id:80, topic:'performance', level:'medium', q:'What is the difference between repartition() and coalesce()?', a:'repartition(n) does a full shuffle and can increase or decrease partition count. coalesce(n) minimizes shuffle by only merging partitions — use to reduce partition count efficiently.',code:''},
+  {id:81, topic:'performance', level:'medium', q:'What is Adaptive Query Execution (AQE)?', a:'AQE (Spark 3+) re-optimizes query plans at runtime based on actual data statistics: it coalesces small shuffle partitions, handles join skew, and switches join strategies automatically.',code:'spark.conf.set("spark.sql.adaptive.enabled", "true")'},
+  {id:82, topic:'performance', level:'medium', q:'When should you cache a DataFrame?', a:'Cache when you reuse a DataFrame multiple times in a computation. Caching avoids recomputing transformations. Use unpersist() when done to free memory.',code:'df.cache()          # default: MEMORY_AND_DISK\ndf.persist()        # same as cache()\ndf.count()          # trigger the cache\ndf.unpersist()      # free memory'},
+  {id:83, topic:'performance', level:'hard', q:'What causes data skew and how do you fix it?', a:'Skew happens when one key has far more rows than others, causing one task to run much longer. Fix: use AQE skew join, salting technique, or broadcast join for small tables.',code:'# Salting example\nimport random\nfrom pyspark.sql.functions import udf\nfrom pyspark.sql.types import IntegerType\n\nsalt_udf = udf(lambda: random.randint(0, 9), IntegerType())\ndf = df.withColumn("salt", salt_udf())\ndf = df.withColumn("salted_key", concat(col("key"), lit("_"), col("salt")))'},
+  {id:84, topic:'performance', level:'hard', q:'How do you read only specific partitions from a partitioned Delta table?', a:'Partition pruning: Spark automatically skips partitions not matching your filter when the filter column is the partition column.',code:'# Data saved with partitionBy("year", "month")\ndf = spark.read.format("delta")\\\n    .load("/delta/sales")\\\n    .filter("year = 2024 AND month = 3")  # Only reads 2024/03 partition'},
+  {id:85, topic:'performance', level:'medium', q:'What is the Spark UI and what can you learn from it?', a:'The Spark UI (port 4040) shows Jobs, Stages, Tasks, DAG visualization, storage, and SQL query plans. Use it to identify: skew (one task takes much longer), spill (data written to disk), shuffle size, and failed tasks.',code:''},
+
+  // MORE TRANSFORMATIONS
+  {id:86, topic:'transformations', level:'medium', q:'How do you use date functions in PySpark?', a:'',code:'from pyspark.sql.functions import to_date, date_add, datediff, year, month, dayofmonth, trunc\ndf.withColumn("hire_date", to_date(col("hire_str"), "yyyy-MM-dd"))\n  .withColumn("days_employed", datediff(current_date(), col("hire_date")))\n  .withColumn("year", year(col("hire_date")))\n  .show()'},
+  {id:87, topic:'transformations', level:'medium', q:'How do you combine two DataFrames (union)?', a:'',code:'df_combined = df1.union(df2)       # same schema required\ndf_combined = df1.unionByName(df2) # matches by column name'},
+  {id:88, topic:'transformations', level:'medium', q:'How do you convert a PySpark DataFrame to Pandas?', a:'',code:'pandas_df = spark_df.toPandas()  # Brings all data to driver\n# Reverse:\nfrom pyspark.sql import SparkSession\nspark_df = spark.createDataFrame(pandas_df)'},
+  {id:89, topic:'transformations', level:'hard', q:'How do you apply a custom Python function to a Spark DataFrame efficiently?', a:'Use pandas_udf (vectorized UDF) — much faster than regular UDF because it uses Apache Arrow for columnar batch processing.',code:'from pyspark.sql.functions import pandas_udf\nfrom pyspark.sql.types import DoubleType\nimport pandas as pd\n\n@pandas_udf(DoubleType())\ndef tax_calc(salary: pd.Series) -> pd.Series:\n    return salary * 0.3\n\ndf.withColumn("tax", tax_calc(col("salary"))).show()'},
+  {id:90, topic:'transformations', level:'hard', q:'How do you convert JSON strings in a column to struct?', a:'',code:'from pyspark.sql.functions import from_json, schema_of_json\n\njson_schema = schema_of_json(\'{"name":"x","age":30}\')\ndf.withColumn("parsed", from_json(col("json_col"), json_schema))\\\n  .select("parsed.name", "parsed.age").show()'},
+
+  // MORE SQL
+  {id:91, topic:'sql', level:'medium', q:'How do you find employees who joined in the last 30 days using SQL?', a:'',code:'spark.sql("""\n  SELECT * FROM employees\n  WHERE hire_date >= date_sub(current_date(), 30)\n""").show()'},
+  {id:92, topic:'sql', level:'medium', q:'How do you concatenate columns in Spark SQL?', a:'',code:'spark.sql("""\n  SELECT CONCAT(first_name, \' \', last_name) as full_name,\n         CONCAT_WS(\'-\', city, state) as location\n  FROM employees\n""").show()'},
+  {id:93, topic:'sql', level:'hard', q:'How do you calculate year-over-year growth using window functions in SQL?', a:'',code:'spark.sql("""\n  SELECT year, sales,\n    LAG(sales) OVER (ORDER BY year) as prev_year,\n    ROUND((sales - LAG(sales) OVER (ORDER BY year))\n      / LAG(sales) OVER (ORDER BY year) * 100, 2) as yoy_growth_pct\n  FROM yearly_sales\n""").show()'},
+  {id:94, topic:'sql', level:'hard', q:'Write SQL to find customers who bought product A but not product B.', a:'',code:'spark.sql("""\n  SELECT DISTINCT customer_id\n  FROM orders WHERE product = \'A\'\n  AND customer_id NOT IN (\n    SELECT customer_id FROM orders WHERE product = \'B\'\n  )\n""").show()'},
+  {id:95, topic:'sql', level:'hard', q:'How do you transpose rows to columns dynamically in Spark SQL?', a:'Unlike SQL Server, Spark SQL PIVOT requires knowing column values. Use collect() to get distinct values then build dynamic SQL.',code:'vals = [r[0] for r in spark.sql("SELECT DISTINCT quarter FROM sales ORDER BY quarter").collect()]\npivot_cols = ", ".join([f"\'{v}\'" for v in vals])\nresult = spark.sql(f"""\n  SELECT * FROM (SELECT dept, quarter, amount FROM sales)\n  PIVOT (SUM(amount) FOR quarter IN ({pivot_cols}))\n""")'},
+
+  // MORE DELTA
+  {id:96, topic:'delta', level:'medium', q:'How do you restore a Delta table to a previous version?', a:'',code:'spark.sql("RESTORE TABLE employees TO VERSION AS OF 5")\n# Or by timestamp:\nspark.sql("RESTORE TABLE employees TO TIMESTAMP AS OF \'2024-01-01\'")'},
+  {id:97, topic:'delta', level:'medium', q:'How do you clone a Delta table?', a:'',code:'# Shallow clone (references same data files)\nspark.sql("CREATE TABLE emp_clone SHALLOW CLONE employees")\n\n# Deep clone (copies all files)\nspark.sql("CREATE TABLE emp_backup DEEP CLONE employees LOCATION \'/delta/backups/emp\'")'},
+  {id:98, topic:'delta', level:'hard', q:'How do you handle schema mismatch when writing to a Delta table?', a:'',code:'# Option 1: mergeSchema (adds new columns)\ndf.write.format("delta")\\\n    .option("mergeSchema", "true")\\\n    .mode("append").save("/delta/emp")\n\n# Option 2: overwriteSchema (replace schema)\ndf.write.format("delta")\\\n    .option("overwriteSchema", "true")\\\n    .mode("overwrite").save("/delta/emp")'},
+
+  // MISC / ADVANCED
+  {id:99, topic:'performance', level:'hard', q:'What is Z-Ordering and how does it improve query performance?', a:'Z-Ordering co-locates related rows in the same files based on a column(s). When you filter on that column, Spark skips entire files (data skipping). Best for high-cardinality filter columns like date, region, product_id.',code:'spark.sql("OPTIMIZE sales ZORDER BY (sale_date, region)")'},
+  {id:100, topic:'basics', level:'medium', q:'How do you pass parameters to a Databricks notebook from a Job?', a:'',code:'# In notebook, define widget:\ndbutils.widgets.text("run_date", "", "Run Date")\nrun_date = dbutils.widgets.get("run_date")\n\n# In job config, pass:\n# {"run_date": "2024-03-15"}\n\n# Or run notebook programmatically:\ndbutils.notebook.run("/path/to/notebook", 120, {"run_date": "2024-03-15"})'},
+  {id:101, topic:'transformations', level:'medium', q:'How do you sample a DataFrame?', a:'',code:'# Random sample (10%)\ndf.sample(fraction=0.1, seed=42).show()\n# Or exact rows:\ndf.limit(100).show()'},
+  {id:102, topic:'transformations', level:'hard', q:'How do you read multiple file formats in a single DataFrame?', a:'',code:'df = spark.read.format("parquet").load(\n    "/data/part1.parquet",\n    "/data/part2.parquet"\n)\n# Wildcard:\ndf = spark.read.format("parquet").load("/data/*.parquet")'},
+  {id:103, topic:'delta', level:'medium', q:'What is Delta Live Tables (DLT)?', a:'DLT is a declarative framework to build reliable data pipelines with Delta Lake. You define tables using @dlt.table decorator with SQL/Python. DLT handles dependencies, data quality checks, and autoscaling.',code:'import dlt\n\n@dlt.table\ndef bronze_orders():\n    return spark.readStream.format("cloudFiles")\\\n        .option("cloudFiles.format", "json")\\\n        .load("/data/orders/")\n\n@dlt.table\n@dlt.expect("valid_amount", "amount > 0")\ndef silver_orders():\n    return dlt.read_stream("bronze_orders")\\\n        .filter("amount IS NOT NULL")'},
+  {id:104, topic:'performance', level:'hard', q:'How do you monitor a running streaming query?', a:'',code:'query = df.writeStream.start()\n\n# Status\nprint(query.status)\n# Progress\nprint(query.lastProgress)\n# All queries\nfor q in spark.streams.active:\n    print(q.name, q.status)'},
+  {id:105, topic:'aggregations', level:'hard', q:'How do you do a complex multi-level aggregation (rollup/cube)?', a:'',code:'# ROLLUP - subtotals at each level\ndf.rollup("year", "quarter", "region")\\\n  .agg(sum("sales")).show()\n\n# CUBE - all combinations of subtotals\ndf.cube("year", "quarter", "region")\\\n  .agg(sum("sales")).show()'},
+  {id:106, topic:'joins', level:'hard', q:'How do you efficiently join a large fact table with a slowly changing dim?', a:'Use Delta MERGE for SCD. For read-time joins, broadcast the dimension table if small. For large dims, ensure both are partitioned on the join key. Use AQE to handle skew automatically.',code:''},
+  {id:107, topic:'transformations', level:'medium', q:'How do you parse nested JSON into a flat DataFrame?', a:'',code:'from pyspark.sql.functions import from_json, col\nfrom pyspark.sql.types import *\n\nschema = StructType([\n    StructField("user", StructType([\n        StructField("id", IntegerType()),\n        StructField("name", StringType())\n    ])),\n    StructField("amount", DoubleType())\n])\n\ndf.withColumn("data", from_json(col("json_str"), schema))\\\n  .select("data.user.id", "data.user.name", "data.amount").show()'},
+  {id:108, topic:'sql', level:'easy', q:'How do you describe a table schema in Databricks?', a:'',code:'spark.sql("DESCRIBE TABLE employees").show()\nspark.sql("DESCRIBE DETAIL employees").show()\n# Extended info including Delta metadata:\nspark.sql("DESCRIBE EXTENDED employees").show()'},
+  {id:109, topic:'basics', level:'medium', q:'What is Unity Catalog and how is it different from Hive Metastore?', a:'Unity Catalog is Databricks\'s centralized governance layer for all data assets. It provides 3-level namespace (catalog.schema.table), fine-grained access control, data lineage, and cross-workspace sharing. Hive Metastore only has 2-level namespace (schema.table).',code:'-- 3-level namespace in Unity Catalog\nSELECT * FROM my_catalog.sales_schema.orders'},
+  {id:110, topic:'performance', level:'hard', q:'How do you handle the "small files problem" in Delta Lake?', a:'Many small files slow down reads (too much metadata). Fix: OPTIMIZE to compact files, use ZORDER to reduce files accessed per query, enable auto-optimize in Delta properties, use larger batch sizes in streaming.',code:'-- Auto-optimize on write\nspark.sql("""\n  ALTER TABLE orders\n  SET TBLPROPERTIES (\n    delta.autoOptimize.optimizeWrite = true,\n    delta.autoOptimize.autoCompact = true\n  )\n""")'}
+];
+
+// ===== CSV DATASETS =====
+const datasets = [
+  {
+    title: "employees.csv",
+    badge: "HR Data",
+    desc: "Employee records for transformations, groupBy, joins",
+    rows: [
+      ["emp_id","name","dept","salary","city","hire_date","manager_id"],
+      [1,"Ravi Kumar","Engineering",85000,"Hyderabad","2021-03-15",5],
+      [2,"Priya Sharma","Marketing",62000,"Mumbai","2020-07-22",6],
+      [3,"Arjun Reddy","Engineering",92000,"Bangalore","2019-11-01",5],
+      [4,"Anjali Singh","HR",55000,"Delhi","2022-01-10",7],
+      [5,"Siddharth Rao","Engineering",110000,"Hyderabad","2018-06-30",null],
+      [6,"Kavya Nair","Marketing",75000,"Chennai","2017-04-05",null],
+      [7,"Rahul Gupta","HR",68000,"Pune","2016-09-20",null],
+      [8,"Deepa Menon","Engineering",78000,"Hyderabad","2023-02-14",5],
+    ],
+    filename: "employees.csv"
+  },
+  {
+    title: "sales.csv",
+    badge: "Sales Data",
+    desc: "Monthly sales for aggregations, window functions, time series",
+    rows: [
+      ["sale_id","region","product","amount","quantity","sale_date","salesperson"],
+      [101,"South","Laptop",85000,2,"2024-01-05","Ravi"],
+      [102,"North","Phone",32000,5,"2024-01-08","Priya"],
+      [103,"South","Laptop",92000,1,"2024-01-12","Arjun"],
+      [104,"East","Tablet",45000,3,"2024-02-01","Anjali"],
+      [105,"West","Phone",28000,4,"2024-02-15","Ravi"],
+      [106,"North","Laptop",88000,2,"2024-02-20","Priya"],
+      [107,"South","Tablet",52000,2,"2024-03-01","Kavya"],
+      [108,"East","Laptop",96000,1,"2024-03-18","Rahul"],
+    ],
+    filename: "sales.csv"
+  },
+  {
+    title: "customers.csv",
+    badge: "CRM Data",
+    desc: "Customer profiles for joins with orders, SCD patterns",
+    rows: [
+      ["customer_id","name","email","city","segment","joined_date"],
+      ["C001","Aarav Joshi","aarav@email.com","Hyderabad","Premium","2020-01-15"],
+      ["C002","Sneha Patel","sneha@email.com","Mumbai","Standard","2019-06-30"],
+      ["C003","Vikram Rao","vikram@email.com","Bangalore","Premium","2021-03-22"],
+      ["C004","Nisha Sharma","nisha@email.com","Delhi","Basic","2022-08-10"],
+      ["C005","Kiran Kumar","kiran@email.com","Chennai","Standard","2018-11-05"],
+      ["C006","Divya Nair","divya@email.com","Pune","Premium","2023-02-28"],
+    ],
+    filename: "customers.csv"
+  },
+  {
+    title: "orders.csv",
+    badge: "E-Commerce",
+    desc: "Order transactions for joins, aggregations, customer analysis",
+    rows: [
+      ["order_id","customer_id","product_id","amount","status","order_date"],
+      ["O001","C001","P101",15000,"Delivered","2024-01-10"],
+      ["O002","C002","P102",8500,"Shipped","2024-01-15"],
+      ["O003","C001","P103",23000,"Delivered","2024-01-20"],
+      ["O004","C003","P101",15000,"Cancelled","2024-02-05"],
+      ["O005","C004","P104",4200,"Delivered","2024-02-10"],
+      ["O006","C002","P102",8500,"Pending","2024-02-18"],
+      ["O007","C005","P103",23000,"Delivered","2024-03-01"],
+      ["O008","C001","P105",67000,"Shipped","2024-03-15"],
+    ],
+    filename: "orders.csv"
+  },
+  {
+    title: "products.csv",
+    badge: "Catalog",
+    desc: "Product master for dimension joins and price analysis",
+    rows: [
+      ["product_id","name","category","price","stock","supplier"],
+      ["P101","Laptop Pro","Electronics",75000,50,"TechCorp"],
+      ["P102","Smart Phone","Electronics",32000,120,"MobilePlus"],
+      ["P103","4K Monitor","Electronics",28000,35,"ScreenTech"],
+      ["P104","Wireless Mouse","Accessories",1500,200,"AccessoriesHub"],
+      ["P105","Laptop Gaming","Electronics",95000,20,"TechCorp"],
+      ["P106","USB Hub","Accessories",800,350,"AccessoriesHub"],
+    ],
+    filename: "products.csv"
+  },
+  {
+    title: "students.csv",
+    badge: "Education",
+    desc: "Student scores for Nth highest, ranking, window practice",
+    rows: [
+      ["student_id","name","subject","score","grade","semester"],
+      [1,"Alice","Math",92,"A","2024-S1"],
+      [2,"Bob","Math",78,"B","2024-S1"],
+      [3,"Carol","Math",92,"A","2024-S1"],
+      [4,"Dave","Math",65,"C","2024-S1"],
+      [5,"Eve","Science",88,"A","2024-S1"],
+      [6,"Frank","Science",72,"B","2024-S1"],
+      [7,"Grace","Science",95,"A","2024-S1"],
+      [8,"Heidi","Math",45,"F","2024-S1"],
+    ],
+    filename: "students.csv"
+  },
+  {
+    title: "transactions.csv",
+    badge: "Finance",
+    desc: "Bank transactions for running totals, fraud detection patterns",
+    rows: [
+      ["txn_id","account_id","type","amount","balance","txn_date","category"],
+      ["T001","ACC101","credit",50000,50000,"2024-01-01","Salary"],
+      ["T002","ACC101","debit",12000,38000,"2024-01-05","Shopping"],
+      ["T003","ACC101","debit",8000,30000,"2024-01-15","Bills"],
+      ["T004","ACC102","credit",75000,75000,"2024-01-01","Salary"],
+      ["T005","ACC102","debit",25000,50000,"2024-01-10","Rent"],
+      ["T006","ACC101","credit",5000,35000,"2024-01-20","Transfer"],
+      ["T007","ACC102","debit",3500,46500,"2024-01-25","Food"],
+      ["T008","ACC101","debit",2000,33000,"2024-01-28","Food"],
+    ],
+    filename: "transactions.csv"
+  },
+  {
+    title: "logs.csv",
+    badge: "Web Logs",
+    desc: "Server access logs for streaming simulation and sessionization",
+    rows: [
+      ["log_id","user_id","page","action","status_code","timestamp","ip"],
+      [1,"U001","/home","view",200,"2024-01-01 09:00:01","10.0.0.1"],
+      [2,"U002","/login","submit",200,"2024-01-01 09:01:05","10.0.0.2"],
+      [3,"U001","/products","view",200,"2024-01-01 09:02:10","10.0.0.1"],
+      [4,"U003","/cart","add",200,"2024-01-01 09:03:22","10.0.0.3"],
+      [5,"U002","/checkout","submit",500,"2024-01-01 09:04:45","10.0.0.2"],
+      [6,"U001","/products","view",200,"2024-01-01 09:05:01","10.0.0.1"],
+      [7,"U004","/home","view",200,"2024-01-01 09:06:33","10.0.0.4"],
+      [8,"U003","/checkout","submit",200,"2024-01-01 09:07:11","10.0.0.3"],
+    ],
+    filename: "logs.csv"
+  }
+];
+
+// ===== CHEATSHEET =====
+const cheats = [
+  { title: "Read Data", code: `# CSV\ndf = spark.read.format("csv")\\\n    .option("header","true")\\\n    .option("inferSchema","true")\\\n    .load("/path/data.csv")\n\n# Parquet\ndf = spark.read.parquet("/path/data")\n\n# Delta\ndf = spark.read.format("delta").load("/delta/table")\n\n# JSON\ndf = spark.read.json("/path/data.json")` },
+  { title: "Write Data", code: `df.write.format("delta")\\\n    .mode("overwrite")  # append|overwrite|ignore|error\\\n    .partitionBy("year","month")\\\n    .option("mergeSchema","true")\\\n    .save("/delta/output")\n\n# Save as table\ndf.write.format("delta").saveAsTable("db.table")` },
+  { title: "Core Transformations", code: `df.select("col1","col2")          # pick columns\ndf.filter(col("age") > 25)        # filter rows\ndf.withColumn("tax", col("sal")*0.2)  # add/update col\ndf.withColumnRenamed("a","b")     # rename\ndf.drop("col")                    # remove col\ndf.dropDuplicates(["email"])       # dedup\ndf.orderBy(col("sal").desc())     # sort\ndf.limit(100)                     # top N rows` },
+  { title: "Aggregations", code: `from pyspark.sql.functions import *\n\ndf.groupBy("dept")\\\n  .agg(\n    count("*").alias("cnt"),\n    avg("salary").alias("avg_sal"),\n    sum("salary").alias("total"),\n    max("salary").alias("max_sal"),\n    collect_list("name").alias("names")\n  ).show()` },
+  { title: "Window Functions", code: `from pyspark.sql import Window\nfrom pyspark.sql.functions import *\n\nw = Window.partitionBy("dept")\\\n          .orderBy(col("salary").desc())\n\ndf.withColumn("rank", rank().over(w))\\\n  .withColumn("dense_rank", dense_rank().over(w))\\\n  .withColumn("row_num", row_number().over(w))\\\n  .withColumn("lag_sal", lag("salary",1).over(w))\\\n  .withColumn("lead_sal", lead("salary",1).over(w))` },
+  { title: "Joins", code: `# Inner\nemp.join(dept, "dept_id").show()\n\n# Left\nemp.join(dept, "dept_id", "left").show()\n\n# Anti (no match)\nemp.join(dept, "dept_id", "left_anti").show()\n\n# Broadcast (small table)\nfrom pyspark.sql.functions import broadcast\nemp.join(broadcast(dept), "dept_id").show()` },
+  { title: "Delta Lake", code: `# Create\ndf.write.format("delta").save("/delta/emp")\n\n# MERGE (upsert)\nspark.sql("""\n  MERGE INTO target t USING source s\n  ON t.id = s.id\n  WHEN MATCHED THEN UPDATE SET *\n  WHEN NOT MATCHED THEN INSERT *\n""")\n\n# Time Travel\ndf = spark.read.format("delta")\\\n    .option("versionAsOf", 2)\\\n    .load("/delta/emp")\n\n# Optimize\nspark.sql("OPTIMIZE emp ZORDER BY (dept)")` },
+  { title: "String Functions", code: `from pyspark.sql.functions import *\n\ndf.withColumn("upper", upper(col("name")))\ndf.withColumn("lower", lower(col("email")))\ndf.withColumn("trim", trim(col("name")))\ndf.withColumn("len", length(col("name")))\ndf.withColumn("sub", substring(col("name"),1,3))\ndf.withColumn("rep", regexp_replace(col("ph"),"[^0-9]",""))\ndf.withColumn("split", split(col("name")," "))\ndf.withColumn("concat", concat(col("a"),lit("-"),col("b")))` },
+  { title: "Date Functions", code: `from pyspark.sql.functions import *\n\ncurrent_date()          # today\ncurrent_timestamp()     # now\nto_date(col("d"),"yyyy-MM-dd")\nyear(col("date"))\nmonth(col("date"))\ndayofmonth(col("date"))\ndayofweek(col("date"))\ndate_add(col("date"), 7)\ndatediff(end, start)\ndate_trunc("month", col("date"))\ndate_format(col("date"),"dd-MMM-yyyy")` },
+  { title: "Null Handling", code: `df.dropna()                      # drop any null\ndf.dropna(how="all")             # drop all-null rows\ndf.dropna(subset=["salary"])     # drop if salary null\ndf.fillna(0)                     # fill all with 0\ndf.fillna({"sal":0, "city":"Unknown"})\ndf.filter(col("sal").isNull())\ndf.filter(col("sal").isNotNull())\ndf.na.replace(0, 999, "salary")  # replace` },
+  { title: "UDF & pandas_udf", code: `# Regular UDF (slower)\nfrom pyspark.sql.functions import udf\nfrom pyspark.sql.types import StringType\n\n@udf(StringType())\ndef grade(score):\n    return "Pass" if score >= 40 else "Fail"\n\ndf.withColumn("result", grade(col("score")))\n\n# Pandas UDF (vectorized, faster)\nfrom pyspark.sql.functions import pandas_udf\nimport pandas as pd\n\n@pandas_udf("double")\ndef tax(sal: pd.Series) -> pd.Series:\n    return sal * 0.3` },
+  { title: "Streaming (Auto Loader)", code: `# Read streaming\ndf = spark.readStream\\\n    .format("cloudFiles")\\\n    .option("cloudFiles.format","csv")\\\n    .option("cloudFiles.schemaLocation","/schema/")\\\n    .load("/data/incoming/")\n\n# Write to Delta\ndf.writeStream\\\n    .format("delta")\\\n    .outputMode("append")\\\n    .option("checkpointLocation","/chk/")\\\n    .start("/delta/output")` },
+];
+
+// ===== RENDER QUESTIONS =====
+function renderQuestions() {
+  const grid = document.getElementById('q-grid');
+  grid.innerHTML = questions.map(q => `
+    <div class="q-card" data-topic="${q.topic}" data-level="${q.level}" id="qcard-${q.id}">
+      <div class="q-meta">
+        <span class="q-num">#${String(q.id).padStart(3,'0')}</span>
+        <span class="q-level ${q.level}">${q.level}</span>
+        <span class="q-topic">${q.topic}</span>
+      </div>
+      <div class="q-text">${q.q}</div>
+      <button class="toggle-ans" onclick="toggleAnswer(${q.id}, this)">▶ Show Answer</button>
+      <div class="q-answer" id="ans-${q.id}">
+        ${q.a ? `<p style="margin-bottom:10px; color:var(--text);">${q.a}</p>` : ''}
+        ${q.code ? `<pre>${escapeHtml(q.code)}</pre>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+let answeredCount = 0;
+
+function toggleAnswer(id, btn) {
+  const ans = document.getElementById(`ans-${id}`);
+  if (ans.classList.contains('show')) {
+    ans.classList.remove('show');
+    btn.textContent = '▶ Show Answer';
+  } else {
+    ans.classList.add('show');
+    btn.textContent = '▼ Hide Answer';
+    answeredCount++;
+    updateProgress();
+  }
+}
+
+function updateProgress() {
+  document.getElementById('answered-count').textContent = answeredCount;
+  const pct = Math.min((answeredCount / 110) * 100, 100);
+  document.getElementById('overall-bar').style.width = pct + '%';
+}
+
+function filterQ(filter, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const cards = document.querySelectorAll('.q-card');
+  let visible = 0;
+  cards.forEach(c => {
+    const match = filter === 'all' || c.dataset.topic === filter || c.dataset.level === filter;
+    c.classList.toggle('hidden', !match);
+    if (match) visible++;
+  });
+  document.getElementById('q-count').textContent = `${visible} Questions`;
+}
+
+// ===== RENDER CSV =====
+function renderCSV() {
+  const grid = document.getElementById('csv-grid');
+  grid.innerHTML = datasets.map((ds, i) => `
+    <div class="csv-card">
+      <div class="csv-header">
+        <span class="csv-title">${ds.title}</span>
+        <span class="csv-badge">${ds.badge}</span>
+      </div>
+      <div class="csv-preview">
+        <table>
+          <thead><tr>${ds.rows[0].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+          <tbody>${ds.rows.slice(1,5).map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table>
+      </div>
+      <div class="csv-footer">
+        <span class="csv-desc">${ds.desc}</span>
+        <button class="dl-btn" onclick="downloadCSV(${i})">⬇ Download CSV</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function downloadCSV(i) {
+  const ds = datasets[i];
+  const csv = ds.rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = ds.filename;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ===== RENDER CHEATSHEET =====
+function renderCheatsheet() {
+  const grid = document.getElementById('cheat-grid');
+  grid.innerHTML = cheats.map(c => `
+    <div class="cheat-card">
+      <h4>${c.title}</h4>
+      <pre>${escapeHtml(c.code)}</pre>
+    </div>
+  `).join('');
+}
+
+// ===== RENDER PROGRESS =====
+function renderProgress() {
+  const topics = ['basics','transformations','aggregations','joins','window','delta','sql','streaming','performance'];
+  const counts = {};
+  topics.forEach(t => {
+    counts[t] = questions.filter(q => q.topic === t).length;
+  });
+  const colors = {
+    basics:'var(--accent)',transformations:'var(--accent2)',
+    aggregations:'var(--accent3)',joins:'var(--green)',
+    window:'var(--yellow)',delta:'var(--red)',
+    sql:'#06b6d4',streaming:'#f472b6',performance:'#a78bfa'
+  };
+  const bar = document.getElementById('prog-bars');
+  bar.innerHTML = topics.map(t => `
+    <div class="prog-item">
+      <span class="prog-label">${t} (${counts[t]}q)</span>
+      <div class="prog-track"><div class="prog-fill" style="width:0%;background:${colors[t]}" data-w="${Math.round(counts[t]/questions.length*100)}"></div></div>
+      <span class="prog-pct">${counts[t]}q</span>
+    </div>
+  `).join('');
+  setTimeout(() => {
+    document.querySelectorAll('.prog-fill').forEach(el => {
+      el.style.width = el.dataset.w + '%';
+    });
+  }, 100);
+}
+
+// ===== TAB SWITCHING =====
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ===== INIT =====
+renderQuestions();
+renderCSV();
+renderCheatsheet();
+renderProgress();
+</script>
+</body>
+</html>
