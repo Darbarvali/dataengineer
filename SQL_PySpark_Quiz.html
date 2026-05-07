@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL & PySpark MCQ Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --card: #1a1d28;
+    --border: #2a2d3e;
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --accent3: #ff6b6b;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --correct: #00d4aa;
+    --wrong: #ff6b6b;
+    --unanswered: #f59e0b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRID BACKGROUND */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(108,99,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(108,99,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(108,99,255,0.12);
+    border: 1px solid rgba(108,99,255,0.3);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  h1 {
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 60%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 36px;
+  }
+
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 20px;
+    text-align: center;
+    min-width: 100px;
+  }
+
+  .stat-num {
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* PROGRESS */
+  .progress-wrap {
+    background: var(--border);
+    height: 4px;
+    border-radius: 2px;
+    margin-bottom: 36px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* QUESTION CARD */
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .question-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    border-radius: 3px 0 0 3px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .question-card.answered::before { opacity: 1; }
+  .question-card.correct-card::before { background: var(--correct); }
+  .question-card.wrong-card::before { background: var(--wrong); }
+
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .q-num {
+    background: rgba(108,99,255,0.15);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .q-text {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  /* OPTIONS */
+  .options {
+    display: grid;
+    gap: 10px;
+  }
+
+  .option-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+
+  .option-label:hover {
+    border-color: var(--accent);
+    background: rgba(108,99,255,0.06);
+  }
+
+  .option-label input[type="radio"] {
+    display: none;
+  }
+
+  .radio-custom {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .radio-custom::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: var(--accent);
+    transform: scale(0);
+    transition: transform 0.15s;
+  }
+
+  .option-label input:checked ~ .radio-custom {
+    border-color: var(--accent);
+  }
+
+  .option-label input:checked ~ .radio-custom::after {
+    transform: scale(1);
+  }
+
+  .option-label input:checked ~ .option-text {
+    color: #fff;
+    font-weight: 500;
+  }
+
+  .option-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    min-width: 18px;
+  }
+
+  .option-text {
+    font-size: 14px;
+    color: #c9ccd8;
+    line-height: 1.4;
+  }
+
+  /* RESULT STATES */
+  .option-label.correct-ans {
+    border-color: var(--correct);
+    background: rgba(0,212,170,0.08);
+  }
+  .option-label.correct-ans .option-text { color: var(--correct); font-weight: 600; }
+  .option-label.wrong-ans {
+    border-color: var(--wrong);
+    background: rgba(255,107,107,0.08);
+  }
+  .option-label.wrong-ans .option-text { color: var(--wrong); }
+  .option-label.result-disabled { cursor: default; pointer-events: none; }
+
+  /* RESULT BADGE ON CARD */
+  .result-tag {
+    display: none;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .result-tag.show { display: inline-block; }
+  .result-tag.correct { background: rgba(0,212,170,0.15); color: var(--correct); }
+  .result-tag.wrong { background: rgba(255,107,107,0.15); color: var(--wrong); }
+
+  /* ACTIONS */
+  .actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin: 40px 0;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: 12px;
+    border: none;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(108,99,255,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(108,99,255,0.45); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-pdf {
+    background: linear-gradient(135deg, var(--accent2), #059669);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(0,212,170,0.25);
+  }
+  .btn-pdf:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,212,170,0.4); }
+  .btn-pdf:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* RESULT PANEL */
+  #result-panel {
+    display: none;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .score-ring {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 24px;
+    position: relative;
+  }
+
+  .score-ring svg {
+    transform: rotate(-90deg);
+  }
+
+  .score-ring .ring-bg {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 10;
+  }
+
+  .score-ring .ring-fill {
+    fill: none;
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-dasharray: 408;
+    stroke-dashoffset: 408;
+    transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1);
+  }
+
+  .score-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .score-num {
+    font-size: 30px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    color: #fff;
+  }
+
+  .score-total {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .result-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .result-msg {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+
+  .breakdown {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+
+  .breakdown-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .breakdown-item span { font-family: 'JetBrains Mono', monospace; }
+  .breakdown-item.b-correct { border-color: var(--correct); color: var(--correct); }
+  .breakdown-item.b-wrong { border-color: var(--wrong); color: var(--wrong); }
+  .breakdown-item.b-skip { border-color: var(--unanswered); color: var(--unanswered); }
+
+  /* FILTER TABS */
+  .filter-tabs {
+    display: none;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .tab {
+    padding: 7px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .tab.active, .tab:hover { border-color: var(--accent); color: var(--accent); background: rgba(108,99,255,0.08); }
+  .tab.tab-correct.active { border-color: var(--correct); color: var(--correct); background: rgba(0,212,170,0.08); }
+  .tab.tab-wrong.active { border-color: var(--wrong); color: var(--wrong); background: rgba(255,107,107,0.08); }
+  .tab.tab-skip.active { border-color: var(--unanswered); color: var(--unanswered); background: rgba(245,158,11,0.08); }
+
+  .hidden { display: none !important; }
+
+  /* TOAST */
+  #toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--card);
+    border: 1px solid var(--accent);
+    color: var(--text);
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: transform 0.3s ease;
+    z-index: 100;
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 600px) {
+    .question-card { padding: 20px 18px; }
+    .actions { flex-direction: column; align-items: center; }
+    .btn { width: 100%; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <header>
+    <div class="badge">🧠 Technical Assessment</div>
+    <h1>SQL & PySpark MCQ Quiz</h1>
+    <p class="subtitle">50 Questions · Basics to Medium · Delta Tables Included</p>
+  </header>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-num" id="stat-answered">0</div><div class="stat-label">Answered</div></div>
+    <div class="stat"><div class="stat-num" id="stat-total">50</div><div class="stat-label">Total</div></div>
+    <div class="stat"><div class="stat-num" id="stat-remaining">50</div><div class="stat-label">Remaining</div></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+
+  <div id="result-panel">
+    <div class="score-ring">
+      <svg width="140" height="140" viewBox="0 0 140 140">
+        <circle class="ring-bg" cx="70" cy="70" r="65"/>
+        <circle class="ring-fill" id="ring-fill" cx="70" cy="70" r="65"/>
+      </svg>
+      <div class="score-center">
+        <div class="score-num" id="score-num">0</div>
+        <div class="score-total">/ 50</div>
+      </div>
+    </div>
+    <div class="result-title" id="result-title"></div>
+    <div class="result-msg" id="result-msg"></div>
+    <div class="breakdown">
+      <div class="breakdown-item b-correct">✓ Correct <span id="b-correct">0</span></div>
+      <div class="breakdown-item b-wrong">✗ Wrong <span id="b-wrong">0</span></div>
+      <div class="breakdown-item b-skip">— Skipped <span id="b-skip">0</span></div>
+    </div>
+  </div>
+
+  <div class="filter-tabs" id="filter-tabs">
+    <button class="tab active" onclick="filterCards('all')">All (50)</button>
+    <button class="tab tab-correct" onclick="filterCards('correct')" id="tab-correct">Correct (0)</button>
+    <button class="tab tab-wrong" onclick="filterCards('wrong')" id="tab-wrong">Wrong (0)</button>
+    <button class="tab tab-skip" onclick="filterCards('skip')" id="tab-skip">Skipped (0)</button>
+  </div>
+
+  <div id="quiz-container"></div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="submit-btn" onclick="submitQuiz()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      Submit Quiz
+    </button>
+    <button class="btn btn-secondary" id="reset-btn" onclick="resetQuiz()" style="display:none">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.65"/></svg>
+      Reset
+    </button>
+    <button class="btn btn-pdf" id="pdf-btn" onclick="generatePDF()" style="display:none" disabled>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Download PDF Report
+    </button>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+const questions = [
+  { q: "Which function displays DataFrame rows?", opts: ["print()", "show()", "display()", "view()"], ans: 1 },
+  { q: "What is a Delta Lake feature?", opts: ["ACID transactions", "No logs", "No partitions", "No schema"], ans: 0 },
+  { q: "Which command modifies existing data?", opts: ["ALTER", "UPDATE", "MODIFY", "CHANGE"], ans: 1 },
+  { q: "What is repartition() used for?", opts: ["Sort data", "Delete partitions", "Cache data", "Increase/decrease partitions"], ans: 3 },
+  { q: "Which operation is best for reducing shuffle?", opts: ["groupByKey()", "distinct()", "repartition()", "Broadcast Join"], ans: 3 },
+  { q: "Which SQL clause groups rows with same values?", opts: ["HAVING", "PARTITION BY", "GROUP BY", "ORDER BY"], ans: 2 },
+  { q: "Which transformation removes duplicates?", opts: ["drop()", "distinct()", "unique()", "removeDuplicates()"], ans: 1 },
+  { q: "Which join returns all rows from left table?", opts: ["RIGHT JOIN", "INNER JOIN", "CROSS JOIN", "LEFT JOIN"], ans: 3 },
+  { q: "Which storage level keeps data in memory?", opts: ["drop()", "cache()", "persist(None)", "select()"], ans: 1 },
+  { q: "Which key uniquely identifies a row?", opts: ["FOREIGN KEY", "UNIQUE", "INDEX", "PRIMARY KEY"], ans: 3 },
+  { q: "Which command saves DataFrame as Delta table?", opts: ["store.delta()", "write.format('delta')", "save.delta()", "delta.write()"], ans: 1 },
+  { q: "Which operator is used for pattern matching?", opts: ["LIKE", "BETWEEN", "IN", "MATCH"], ans: 0 },
+  { q: "What does VACUUM do in Delta Lake?", opts: ["Caches data", "Removes old files", "Adds partitions", "Creates views"], ans: 1 },
+  { q: "Which Delta operation updates existing rows?", opts: ["CREATE", "INSERT", "COPY", "MERGE"], ans: 3 },
+  { q: "What is the default sorting order in ORDER BY?", opts: ["None", "Ascending", "Descending", "Random"], ans: 1 },
+  { q: "Which join returns matching rows from both tables?", opts: ["INNER JOIN", "RIGHT JOIN", "FULL JOIN", "LEFT JOIN"], ans: 0 },
+  { q: "What does COUNT(*) do?", opts: ["Counts tables", "Counts rows", "Counts columns", "Counts databases"], ans: 1 },
+  { q: "Which Spark transformation flattens nested data?", opts: ["expand()", "flatten()", "merge()", "explode()"], ans: 3 },
+  { q: "Which action returns number of rows?", opts: ["map()", "filter()", "count()", "groupBy()"], ans: 2 },
+  { q: "Which join can cause large shuffle operations?", opts: ["map()", "filter()", "flatMap()", "groupByKey()"], ans: 3 },
+  { q: "Which transformation is narrow?", opts: ["distinct()", "map()", "groupBy()", "join()"], ans: 1 },
+  { q: "Which SQL function calculates average?", opts: ["AVERAGE()", "AVG()", "SUM()", "MEAN()"], ans: 1 },
+  { q: "Which PySpark transformation selects specific columns?", opts: ["filter()", "collect()", "show()", "select()"], ans: 3 },
+  { q: "Which constraint prevents NULL values?", opts: ["CHECK", "NOT NULL", "PRIMARY KEY", "UNIQUE"], ans: 1 },
+  { q: "Which transformation adds a new column?", opts: ["insertColumn()", "addColumn()", "newColumn()", "withColumn()"], ans: 3 },
+  { q: "Which SQL keyword removes duplicate values?", opts: ["REMOVE", "DISTINCT", "FILTER", "UNIQUE"], ans: 1 },
+  { q: "Which PySpark method converts RDD to DataFrame?", opts: ["createDF()", "toDF()", "dataframe()", "convertDF()"], ans: 1 },
+  { q: "What is lazy evaluation in PySpark?", opts: ["Sorting data", "Execution delayed until action", "Caching data", "Immediate execution"], ans: 1 },
+  { q: "What happens during a shuffle in Spark?", opts: ["Data compressed", "Data deleted", "Data moves across partitions", "Data is cached"], ans: 2 },
+  { q: "Which operation triggers Spark job execution?", opts: ["Action", "Shuffle", "Transformation", "Cache"], ans: 0 },
+  { q: "Which Delta command creates a Delta table?", opts: ["ADD DELTA", "CREATE DELTA", "CREATE TABLE USING DELTA", "NEW DELTA TABLE"], ans: 2 },
+  { q: "Which command optimizes Delta tables?", opts: ["COMPACT", "MERGE", "OPTIMIZE", "ANALYZE"], ans: 2 },
+  { q: "Which function returns the highest value in SQL?", opts: ["UPPER()", "HIGH()", "MAX()", "TOP()"], ans: 2 },
+  { q: "Which transformation is wide?", opts: ["select()", "groupBy()", "map()", "filter()"], ans: 1 },
+  { q: "Which Delta feature supports time travel?", opts: ["RDD", "Shuffle", "Transaction log", "Caching"], ans: 2 },
+  { q: "What is the output of collect()?", opts: ["RDD", "List of rows", "Dictionary", "DataFrame"], ans: 1 },
+  { q: "Which SQL statement is used to retrieve data from a database?", opts: ["GET", "SELECT", "FETCH", "EXTRACT"], ans: 1 },
+  { q: "Which SQL operator checks multiple values?", opts: ["IN", "ANY", "LIKE", "BETWEEN"], ans: 0 },
+  { q: "Which clause is used to filter rows in SQL?", opts: ["WHERE", "ORDER BY", "HAVING", "GROUP BY"], ans: 0 },
+  { q: "Which operation is an action in PySpark?", opts: ["select()", "drop()", "withColumn()", "collect()"], ans: 3 },
+  { q: "Which SQL command adds a new row?", opts: ["UPDATE", "ADD", "APPEND", "INSERT"], ans: 3 },
+  { q: "Which statement creates a new table?", opts: ["CREATE TABLE", "NEW TABLE", "MAKE TABLE", "ADD TABLE"], ans: 0 },
+  { q: "What is a temporary view in Spark?", opts: ["External table", "Permanent table", "Cached table", "Session-scoped view"], ans: 3 },
+  { q: "Which PySpark transformation filters rows?", opts: ["filter()", "count()", "take()", "show()"], ans: 0 },
+  { q: "Which type of view stores no data physically?", opts: ["Delta Table", "Materialized View", "Index", "Virtual View"], ans: 3 },
+  { q: "Which SQL command changes table structure?", opts: ["UPDATE TABLE", "MODIFY TABLE", "CHANGE TABLE", "ALTER TABLE"], ans: 3 },
+  { q: "Which command removes rows from a table?", opts: ["TRUNCATE", "DELETE", "DROP", "REMOVE"], ans: 1 },
+  { q: "What is the purpose of HAVING clause?", opts: ["Create indexes", "Filter grouped data", "Join tables", "Sort data"], ans: 1 },
+  { q: "Which command creates temporary view?", opts: ["TEMP TABLE", "createOrReplaceTempView()", "CREATE VIEW", "NEW VIEW"], ans: 1 },
+  { q: "Which SQL statement deletes a table permanently?", opts: ["TRUNCATE TABLE", "REMOVE TABLE", "DROP TABLE", "DELETE TABLE"], ans: 2 }
+];
+
+const keys = ["A", "B", "C", "D"];
+let userAnswers = new Array(50).fill(null);
+let submitted = false;
+
+function buildQuiz() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  questions.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `card-${i}`;
+    card.innerHTML = `
+      <div class="q-header">
+        <span class="q-num">Q${String(i+1).padStart(2,'0')}</span>
+        <div class="q-text">${q.q}</div>
+        <span class="result-tag" id="tag-${i}"></span>
+      </div>
+      <div class="options">
+        ${q.opts.map((opt, j) => `
+          <label class="option-label" id="opt-${i}-${j}">
+            <input type="radio" name="q${i}" value="${j}" onchange="selectAnswer(${i}, ${j})">
+            <div class="radio-custom"></div>
+            <span class="option-key">${keys[j]}</span>
+            <span class="option-text">${opt}</span>
+          </label>
+        `).join('')}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function selectAnswer(qi, oi) {
+  if (submitted) return;
+  userAnswers[qi] = oi;
+  document.getElementById(`card-${qi}`).classList.add('answered');
+  updateStats();
+}
+
+function updateStats() {
+  const answered = userAnswers.filter(a => a !== null).length;
+  document.getElementById('stat-answered').textContent = answered;
+  document.getElementById('stat-remaining').textContent = 50 - answered;
+  document.getElementById('progress-bar').style.width = (answered / 50 * 100) + '%';
+}
+
+function submitQuiz() {
+  const answered = userAnswers.filter(a => a !== null).length;
+  if (answered < 50) {
+    const skipped = 50 - answered;
+    if (!confirm(`You have ${skipped} unanswered question(s). Submit anyway?`)) return;
+  }
+
+  submitted = true;
+  document.getElementById('submit-btn').style.display = 'none';
+  document.getElementById('reset-btn').style.display = 'flex';
+  document.getElementById('pdf-btn').style.display = 'flex';
+  document.getElementById('pdf-btn').disabled = false;
+  document.getElementById('filter-tabs').style.display = 'flex';
+
+  let correct = 0, wrong = 0, skip = 0;
+
+  questions.forEach((q, i) => {
+    const card = document.getElementById(`card-${i}`);
+    const tag = document.getElementById(`tag-${i}`);
+    const ua = userAnswers[i];
+
+    // Disable all options
+    q.opts.forEach((_, j) => {
+      const lbl = document.getElementById(`opt-${i}-${j}`);
+      lbl.classList.add('result-disabled');
+    });
+
+    // Mark correct answer
+    document.getElementById(`opt-${i}-${q.ans}`).classList.add('correct-ans');
+
+    if (ua === null) {
+      skip++;
+      card.classList.remove('answered');
+      tag.textContent = 'SKIPPED';
+      tag.className = 'result-tag show';
+      tag.style.background = 'rgba(245,158,11,0.15)';
+      tag.style.color = '#f59e0b';
+    } else if (ua === q.ans) {
+      correct++;
+      card.classList.add('correct-card');
+      tag.textContent = '✓ CORRECT';
+      tag.className = 'result-tag show correct';
+    } else {
+      wrong++;
+      document.getElementById(`opt-${i}-${ua}`).classList.add('wrong-ans');
+      card.classList.add('wrong-card');
+      tag.textContent = '✗ WRONG';
+      tag.className = 'result-tag show wrong';
+    }
+  });
+
+  // Show result panel
+  const panel = document.getElementById('result-panel');
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  document.getElementById('score-num').textContent = correct;
+  document.getElementById('b-correct').textContent = correct;
+  document.getElementById('b-wrong').textContent = wrong;
+  document.getElementById('b-skip').textContent = skip;
+
+  const pct = Math.round(correct / 50 * 100);
+  const ring = document.getElementById('ring-fill');
+  const circumference = 408;
+  const color = pct >= 80 ? '#00d4aa' : pct >= 60 ? '#6c63ff' : '#ff6b6b';
+  ring.style.stroke = color;
+  setTimeout(() => {
+    ring.style.strokeDashoffset = circumference - (circumference * pct / 100);
+  }, 300);
+
+  let title, msg;
+  if (pct >= 90) { title = "🏆 Outstanding!"; msg = "You've mastered SQL & PySpark. Excellent work!"; }
+  else if (pct >= 75) { title = "🎯 Great Job!"; msg = "Strong performance. Keep refining the edge cases."; }
+  else if (pct >= 60) { title = "📚 Good Effort!"; msg = "Solid foundation. Review the highlighted questions."; }
+  else { title = "💪 Keep Practicing!"; msg = "Review the concepts and try again. You've got this!"; }
+
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-msg').textContent = msg;
+
+  document.getElementById('tab-correct').textContent = `Correct (${correct})`;
+  document.getElementById('tab-wrong').textContent = `Wrong (${wrong})`;
+  document.getElementById('tab-skip').textContent = `Skipped (${skip})`;
+
+  updateStats();
+}
+
+function filterCards(type) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+
+  questions.forEach((q, i) => {
+    const card = document.getElementById(`card-${i}`);
+    const ua = userAnswers[i];
+    let show = true;
+    if (type === 'correct') show = ua === q.ans;
+    else if (type === 'wrong') show = ua !== null && ua !== q.ans;
+    else if (type === 'skip') show = ua === null;
+    card.classList.toggle('hidden', !show);
+  });
+}
+
+function resetQuiz() {
+  if (!confirm('Reset the quiz? All answers will be cleared.')) return;
+  userAnswers = new Array(50).fill(null);
+  submitted = false;
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('filter-tabs').style.display = 'none';
+  document.getElementById('submit-btn').style.display = 'flex';
+  document.getElementById('reset-btn').style.display = 'none';
+  document.getElementById('pdf-btn').style.display = 'none';
+  document.getElementById('progress-bar').style.width = '0%';
+  buildQuiz();
+  updateStats();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function generatePDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pw = 210, ph = 297;
+  const ml = 18, mr = 18, mt = 20;
+  let y = mt;
+
+  const correct = questions.filter((q, i) => userAnswers[i] === q.ans).length;
+  const wrong = questions.filter((q, i) => userAnswers[i] !== null && userAnswers[i] !== q.ans).length;
+  const skip = questions.filter((q, i) => userAnswers[i] === null).length;
+  const pct = Math.round(correct / 50 * 100);
+
+  const newPage = () => {
+    doc.addPage();
+    y = mt;
+  };
+
+  const checkPage = (needed = 20) => {
+    if (y + needed > ph - 15) newPage();
+  };
+
+  // TITLE PAGE
+  doc.setFillColor(13, 15, 20);
+  doc.rect(0, 0, pw, ph, 'F');
+
+  doc.setFillColor(108, 99, 255);
+  doc.rect(0, 0, 6, ph, 'F');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(24);
+  doc.setTextColor(232, 234, 240);
+  doc.text('SQL & PySpark MCQ', ml + 6, 55);
+  doc.text('Quiz Report', ml + 6, 68);
+
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(107, 114, 128);
+  doc.text('50 Questions · SQL Basics to Medium · PySpark · Delta Tables', ml + 6, 80);
+
+  const date = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
+  doc.text(`Generated: ${date}`, ml + 6, 88);
+
+  // Score box
+  doc.setFillColor(26, 29, 40);
+  doc.roundedRect(ml + 6, 105, pw - ml - mr - 6, 70, 6, 6, 'F');
+  doc.setDrawColor(42, 45, 62);
+  doc.roundedRect(ml + 6, 105, pw - ml - mr - 6, 70, 6, 6, 'S');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(48);
+  doc.setTextColor(pct >= 80 ? 0 : pct >= 60 ? 108 : 255,
+                   pct >= 80 ? 212 : pct >= 60 ? 99 : 107,
+                   pct >= 80 ? 170 : pct >= 60 ? 255 : 107);
+  doc.text(`${pct}%`, 105, 135, { align: 'center' });
+
+  doc.setFontSize(13);
+  doc.setTextColor(180, 185, 200);
+  doc.text(`Score: ${correct} / 50`, 105, 148, { align: 'center' });
+
+  const scores = [
+    { label: 'Correct', val: correct, r: 0, g: 212, b: 170 },
+    { label: 'Wrong', val: wrong, r: 255, g: 107, b: 107 },
+    { label: 'Skipped', val: skip, r: 245, g: 158, b: 11 }
+  ];
+
+  scores.forEach((s, idx) => {
+    const bx = ml + 6 + idx * 56 + 8;
+    const by = 158;
+    doc.setFillColor(s.r, s.g, s.b, 0.1);
+    doc.setFillColor(20, 23, 35);
+    doc.roundedRect(bx, by, 50, 12, 3, 3, 'F');
+    doc.setFontSize(10);
+    doc.setTextColor(s.r, s.g, s.b);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${s.label}: ${s.val}`, bx + 25, by + 8, { align: 'center' });
+  });
+
+  // QUESTIONS PAGES
+  doc.addPage();
+  doc.setFillColor(13, 15, 20);
+  doc.rect(0, 0, pw, ph, 'F');
+  doc.setFillColor(108, 99, 255);
+  doc.rect(0, 0, 3, ph, 'F');
+  y = mt;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.setTextColor(232, 234, 240);
+  doc.text('Detailed Answers', ml, y);
+  y += 12;
+
+  questions.forEach((q, i) => {
+    const ua = userAnswers[i];
+    const isCorrect = ua === q.ans;
+    const isSkip = ua === null;
+
+    const statusColor = isSkip ? [245, 158, 11] : isCorrect ? [0, 212, 170] : [255, 107, 107];
+    const qLines = doc.splitTextToSize(`Q${i+1}. ${q.q}`, pw - ml - mr - 20);
+    const neededH = qLines.length * 5 + q.opts.length * 7 + 18;
+
+    checkPage(neededH);
+
+    // Q header
+    doc.setFillColor(26, 29, 40);
+    doc.roundedRect(ml, y, pw - ml - mr, neededH - 4, 4, 4, 'F');
+    doc.setDrawColor(...statusColor);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(ml, y, pw - ml - mr, neededH - 4, 4, 4, 'S');
+    doc.setFillColor(...statusColor);
+    doc.rect(ml, y + 2, 3, neededH - 8, 'F');
+
+    y += 6;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...statusColor);
+    doc.text(isSkip ? 'SKIPPED' : isCorrect ? '✓ CORRECT' : '✗ WRONG', pw - mr - 2, y, { align: 'right' });
+
+    doc.setTextColor(232, 234, 240);
+    doc.setFontSize(10);
+    doc.text(qLines, ml + 8, y);
+    y += qLines.length * 5 + 4;
+
+    q.opts.forEach((opt, j) => {
+      let tc = [107, 114, 128];
+      if (j === q.ans) tc = [0, 212, 170];
+      else if (j === ua && !isCorrect) tc = [255, 107, 107];
+
+      doc.setFont(j === q.ans || j === ua ? 'helvetica' : 'helvetica', j === q.ans ? 'bold' : 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(...tc);
+
+      const prefix = j === q.ans ? '✓' : j === ua && !isCorrect ? '✗' : ' ';
+      doc.text(`${prefix} ${keys[j]}. ${opt}`, ml + 10, y);
+      y += 6;
+    });
+
+    y += 8;
+
+    // Page background on new pages
+    if (y > ph - 20 && i < questions.length - 1) {
+      newPage();
+      doc.setFillColor(13, 15, 20);
+      doc.rect(0, 0, pw, ph, 'F');
+      doc.setFillColor(108, 99, 255);
+      doc.rect(0, 0, 3, ph, 'F');
+    }
+  });
+
+  // Footer on last page
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(107, 114, 128);
+  doc.text('SQL & PySpark MCQ Quiz Report', 105, ph - 10, { align: 'center' });
+
+  doc.save('SQL_PySpark_Quiz_Report.pdf');
+  showToast('📄 PDF downloaded successfully!');
+}
+
+// Init
+buildQuiz();
+updateStats();
+</script>
+</body>
+</html>
